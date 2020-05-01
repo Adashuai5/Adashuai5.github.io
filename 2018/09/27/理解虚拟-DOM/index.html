@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Zhou Yuanda">
+
+
+    <meta name="subtitle" content="试问谁可，洁白无比？">
+
+
+    <meta name="description" content="当然我也在扯淡。。">
+
+
+    <meta name="keywords" content="前端开发">
+
+
+<title>理解虚拟 DOM | Ada 的个人博客主页</title>
+
+
+
+    <link rel="icon" href="/image/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Ada&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Ada&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">理解虚拟 DOM</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Zhou Yuanda</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">September 27, 2018&nbsp;&nbsp;21:10:41</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="DOM-和-Virtual-DOM"><a href="#DOM-和-Virtual-DOM" class="headerlink" title="DOM 和 Virtual DOM"></a>DOM 和 Virtual DOM</h1><p><strong>DOM：Document Object Model 把文档变成对象的模型<br>在没有 DOM 之前，JavaScript 想要操作页面（文档）内的元素比较麻烦，于是有了 DOM API 把文档变成对象的模型，可以通过操作这些 API，直接操作元素，而不需要经过麻烦的遍历等基本操作。有了 DOM 写代码的人是舒服了（当然我们知道 DOM 也比较麻烦），但是事实上它的速度自然没有原生 js 的对象来得快。<br>问题：在需要操作大量页面元素的时候，每当发生更改，有什么办法能够快速生成新页面？<br>你可以很快想到用模版引擎重新渲染整个视图，而这样会产生很多问题，首要问题就是慢。DOM 内部含有大量数据结构，而我们有时只对其中一部分元素内容进行增删改查，但却需要对整个页面进行重复渲染。<br>方法：通过创建与 DOM 的数据结构映射的 Virtual DOM 虚拟数据结构，我们只操作虚拟数据结构，先比较虚拟 DOM 的异同，再将最终操作结果反应到 真实 DOM 中。<br>在整个过程中，DOM 只操作了一次，其他改变的操作，我们都通过操作虚拟 DOM：当页面元素需要发生变化，原本我们需要通过 DOM 操作，重新渲染页面，而现在，我们只需要操作虚拟 DOM ，由虚拟 DOM 对比之前操作，把页面变化部分反馈给 DOM，此时 DOM 只需要渲染变化的一部分，不用再次渲染整个页面，大大提高效率和性能。</strong></p>
+<p><code>Virtual DOM 本质上就是在 JS 和 DOM 之间做了一个缓存。可以类比 CPU 和硬盘，既然硬盘这么慢，我们就在它们之间加个缓存：既然 DOM 这么慢，我们就在它们 JS 和 DOM 之间加个缓存。CPU（JS）只操作内存（Virtual DOM），最后的时候再把变更写入硬盘（DOM）</code></p>
+<h1 id="过程实现"><a href="#过程实现" class="headerlink" title="过程实现"></a>过程实现</h1><p>文档界面</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;div id&#x3D;&quot;root&quot;&gt;&lt;&#x2F;div&gt;</span><br><span class="line">    &lt;script src&#x3D;&quot;.&#x2F;v-dom.js&quot;&gt;&lt;&#x2F;script&gt;</span><br><span class="line">&lt;&#x2F;body&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 定义一个 VNode 类</span><br><span class="line">class VNode &#123;</span><br><span class="line">    constructor(tag, children, text) &#123;</span><br><span class="line">        this.tag &#x3D; tag</span><br><span class="line">        this.children &#x3D; children</span><br><span class="line">        this.text &#x3D; text</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    render() &#123; &#x2F;&#x2F; render 方法，创建子元素</span><br><span class="line">        if (this.tag &#x3D;&#x3D;&#x3D; &#39;#text&#39;) &#123;</span><br><span class="line">            return document.createTextNode(this.text)</span><br><span class="line">        &#125;</span><br><span class="line">        let el &#x3D; document.createElement(this.tag)</span><br><span class="line">        this.children.forEach(vChild &#x3D;&gt; &#123;</span><br><span class="line">            el.appendChild(vChild.render())</span><br><span class="line">        &#125;)</span><br><span class="line">        return el</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F; v 构造函数，判断子元素类型</span><br><span class="line">function v(tag, children, text) &#123;</span><br><span class="line">    if (typeof children &#x3D;&#x3D;&#x3D; &#39;string&#39;) &#123;</span><br><span class="line">        text &#x3D; children</span><br><span class="line">        children &#x3D; []</span><br><span class="line">    &#125;</span><br><span class="line">    return new VNode(tag, children, text)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">let vNode &#x3D; v(&#39;div&#39;, [</span><br><span class="line">    v(&#39;p&#39;, [</span><br><span class="line">        v(&#39;span&#39;, [v(&#39;#text&#39;, &#39;Ada&#39;)])</span><br><span class="line">    ]),</span><br><span class="line">    v(&#39;span&#39;, [v(&#39;#text&#39;, &#39;shuai&#39;)])</span><br><span class="line">])</span><br><span class="line">const root &#x3D; document.querySelector(&#39;#root&#39;)</span><br><span class="line">root.appendChild(vNode.render())</span><br></pre></td></tr></table></figure>
+
+<p>通过上述代码，我们构建了一个简单的虚拟 DOM 树，可以通过它构建一个真正的 DOM 树，渲染到页面中<br><img src="https://upload-images.jianshu.io/upload_images/7094266-762ab26eabd2e04e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""><br><strong>精髓：通过对比新旧虚拟 DOM 树，其原生对象判断页面增删改查了哪些部分，而后单独渲染差异部分。没有这个 patchElement 就失去了虚拟 DOM 的意义，和原始 DOM 效果无异了</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">function patchElement(parent, newVNode, oldVNode, index &#x3D; 0) &#123;</span><br><span class="line">    if (!oldVNode) &#123;</span><br><span class="line">        parent.appendChild(newVNode.render())</span><br><span class="line">    &#125; else if (!newVNode) &#123;</span><br><span class="line">        parent.removeChild(parent.childNodes[index])</span><br><span class="line">    &#125; else if (newVNode.tag !&#x3D;&#x3D; oldVNode.tag || newVNode.text !&#x3D;&#x3D; oldVNode.text) &#123;</span><br><span class="line">        parent.replaceChild(newVNode.render(), parent.childNodes[index])</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        for (let i &#x3D; 0; i &lt; newVNode.children.length || i &lt; oldVNode.children.length; i++) &#123;</span><br><span class="line">            patchElement(parent.childNodes[index], newVNode.children[i], oldVNode.children[i], i)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当然，上述只是简单的算法判断逻辑，但是也能让我们理解其相应过程和原理。</p>
+<p>整个状态变更的过程如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 1. 构建虚拟DOM</span><br><span class="line">let vNode &#x3D; v(&#39;div&#39;, [</span><br><span class="line">    v(&#39;p&#39;, [</span><br><span class="line">        v(&#39;span&#39;, [v(&#39;#text&#39;, &#39;Ada&#39;)])</span><br><span class="line">    ]),</span><br><span class="line">    v(&#39;span&#39;, [v(&#39;#text&#39;, &#39;shuai&#39;)])</span><br><span class="line">])</span><br><span class="line">&#x2F;&#x2F; 3. 生成新的虚拟DOM</span><br><span class="line">let vNode1 &#x3D; v(&#39;div&#39;, [</span><br><span class="line">    v(&#39;p&#39;, [</span><br><span class="line">        v(&#39;span&#39;, [v(&#39;#text&#39;, &#39;Ada&#39;)])</span><br><span class="line">    ]),</span><br><span class="line">    v(&#39;span&#39;, [v(&#39;#text&#39;, &#39;shuai&#39;)]),</span><br><span class="line">    v(&#39;p&#39;, [v(&#39;#text&#39;, &#39;upload&#39;)])</span><br><span class="line">])</span><br><span class="line">&#x2F;&#x2F; 2. 通过虚拟DOM构建真正的DOM</span><br><span class="line">const root &#x3D; document.querySelector(&#39;#root&#39;)</span><br><span class="line">patchElement(root, vNode)</span><br><span class="line">var n &#x3D; 0</span><br><span class="line">&#x2F;&#x2F; 4. 比较两次虚拟DOM树的不同，在真正的DOM元素上应用变更</span><br><span class="line">document.querySelector(&#39;.btn&#39;).onclick &#x3D; function () &#123;</span><br><span class="line">    if (n % 2 &#x3D;&#x3D; 0) &#123;</span><br><span class="line">        patchElement(root, vNode1, vNode)</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        patchElement(root, vNode, vNode1)</span><br><span class="line">    &#125;</span><br><span class="line">    n +&#x3D; 1</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>本文仅供个人学习使用</p>
+<hr>
+<p>主要参考：<a href="https://github.com/livoras/blog/issues/13">深度剖析：如何实现一个 Virtual DOM 算法</a></p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Zhou Yuanda</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://github.com/Adashuai5/Adashuai5.github.io/2018/09/27/%E7%90%86%E8%A7%A3%E8%99%9A%E6%8B%9F-DOM/">https://github.com/Adashuai5/Adashuai5.github.io/2018/09/27/%E7%90%86%E8%A7%A3%E8%99%9A%E6%8B%9F-DOM/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/"># 设计模式</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2018/10/28/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E9%80%9F%E8%AE%B0/">正则表达式速记</a>
+            
+            
+            <a class="next" rel="next" href="/2018/09/16/HTTP-%E5%AD%A6%E4%B9%A0%E4%B9%8B-Cookie/">HTTP 学习之 Cookie</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Zhou Yuanda | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

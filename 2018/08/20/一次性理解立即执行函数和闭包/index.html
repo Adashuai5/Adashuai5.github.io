@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Zhou Yuanda">
+
+
+    <meta name="subtitle" content="试问谁可，洁白无比？">
+
+
+    <meta name="description" content="当然我也在扯淡。。">
+
+
+    <meta name="keywords" content="前端开发">
+
+
+<title>一次性理解立即执行函数和闭包 | Ada 的个人博客主页</title>
+
+
+
+    <link rel="icon" href="/image/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Ada&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Ada&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">一次性理解立即执行函数和闭包</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Zhou Yuanda</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">August 20, 2018&nbsp;&nbsp;0:29:46</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="Immediately-Invoked-Function-Expression（IIFE）：立即调用函数表达式"><a href="#Immediately-Invoked-Function-Expression（IIFE）：立即调用函数表达式" class="headerlink" title="Immediately-Invoked Function Expression（IIFE）：立即调用函数表达式"></a>Immediately-Invoked Function Expression（IIFE）：立即调用函数表达式</h1><p><strong>使用全局变量可能会造成一些不必要的麻烦<br>因此我们要使用局部变量</strong></p>
+<p>在 java 语言中我们可以用 { } 将代码包裹起来，使它们成为局部变量<br>但是这在 ES5 中不行，因为 var 有变量提升</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  var a &#x3D; 1;</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F; 上面代码等同于</span><br><span class="line">var a</span><br><span class="line">&#123;</span><br><span class="line">  a &#x3D; 1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>ES6 里面引入了 let 的概念，于是有了块级作用域</strong><br>解决了这个问题，IIFE 似乎就变得不那么必要了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  let a &#x3D; 1;</span><br><span class="line">&#125;</span><br><span class="line">a</span><br><span class="line">&#x2F;&#x2F; Uncaught ReferenceError: a is not defined</span><br></pre></td></tr></table></figure>
+
+<p>但是了解 IIFE 可以让我们初学者更好得理解函数表达式、变量提升等的概念，以及了解前端语言的发展进程，知道前人一步步将原本不那么美好的 js 变得规范化的过程，学习他们的智慧。</p>
+<p><strong>ES5 里面，没有块级作用域，只有函数（函数作用域）可提供局部变量环境</strong><br>于是我们声明一个 function xxx，然后 xxx.call()</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">function xxx()&#123;</span><br><span class="line">  var a &#x3D; 1;</span><br><span class="line">&#125;.call()</span><br></pre></td></tr></table></figure>
+
+<p>但是这个时候 xxx 也是全局变量（全局函数）<br>所以我们不能给这个函数名字，即需要使用<strong>匿名函数</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">function()&#123;</span><br><span class="line">  var a &#x3D; 1;</span><br><span class="line">&#125;.call()</span><br><span class="line">&#x2F;&#x2F; Uncaught SyntaxError: Unexpected token (</span><br></pre></td></tr></table></figure>
+
+<p>但是这在 Chrome 里会报错，js 语法错误</p>
+<p><strong>这是由于浏览器认为这是一个函数声明<br>解决办法：让浏览器去解析这个函数表达式</strong><br>如给函数取反</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">! function()&#123;</span><br><span class="line">  var a &#x3D; 1;</span><br><span class="line">&#125;.call()</span><br><span class="line">&#x2F;&#x2F; 我们不在乎这个匿名函数的返回值，所以加个 ! 取反没关系</span><br></pre></td></tr></table></figure>
+
+<p>类似的还有</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">+function()&#123;&#125;()</span><br><span class="line">-function()&#123;&#125;()</span><br><span class="line">~function()&#123;&#125;()</span><br><span class="line">void function()&#123;&#125;()</span><br><span class="line">new function()&#123;&#125;()</span><br><span class="line">&#x2F;&#x2F; function()&#123;&#125;() &#x3D;&#x3D;&#x3D; function()&#123;&#125;.call()</span><br><span class="line">&#x2F;&#x2F;用 .call() 更清楚</span><br></pre></td></tr></table></figure>
+
+<p>如果实在不想改变函数返回值，也可以用圆括号</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(function()&#123;&#125;).call()</span><br><span class="line">(function()&#123;&#125;.call())</span><br></pre></td></tr></table></figure>
+
+<p>但是方法会有不好的情况：如果括号前面有东西</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">a</span><br><span class="line">(function()&#123;&#125;).call()</span><br><span class="line">&#x2F;&#x2F;等价于</span><br><span class="line">a().call()</span><br><span class="line">&#x2F;&#x2F;这不是我们想要的</span><br><span class="line">&#x2F;&#x2F;同理</span><br><span class="line">a</span><br><span class="line">(function()&#123;&#125;.call())</span><br><span class="line">&#x2F;&#x2F;等价于</span><br><span class="line">a()</span><br></pre></td></tr></table></figure>
+
+<p>所以不推荐</p>
+<p>你也可以用一个随机变量名函数而不用匿名函数，永远都不会变量污染的那种变量（这种方法好吗？）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">function ada231231284u3lkda()&#123;</span><br><span class="line">  var a &#x3D; 1;</span><br><span class="line">&#125;.call()</span><br></pre></td></tr></table></figure>
+
+<p><strong>当然最推荐的还是用取反 ！，这就好像是个警示：我要开始用 IIFE 了</strong></p>
+<hr>
+<p><strong>IIFE 达到了局部变量的效果，外面访问不到立即执行函数里面的变量（避免变量污染）</strong></p>
+<p><strong>但有时候我们需要访问 IIFE 里面的内容，怎么办？</strong><br>最简单的方法是直接用全局变量 window</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">! function()&#123;</span><br><span class="line">  var a &#x3D; window.a &#x3D; &#123;</span><br><span class="line">    n: 1</span><br><span class="line">  &#125;</span><br><span class="line">&#125;.call()</span><br><span class="line">&#x2F;&#x2F; 另一个立即执行函数通过 window.a 访问</span><br><span class="line">! function()&#123;</span><br><span class="line">  var b &#x3D; window.a</span><br><span class="line">  console.log(a)</span><br><span class="line">&#125;.call() &#x2F;&#x2F; &#123;n: 1&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>我们还可以在 IIFE 里面使用闭包来隐藏 a</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">! function()&#123;</span><br><span class="line">  var a &#x3D; &#123;</span><br><span class="line">    n: 1</span><br><span class="line">  &#125;</span><br><span class="line">  &#x2F;&#x2F; 声明一个匿名函数保存于 window.nAdd1</span><br><span class="line">  window.nAdd1 &#x3D; function()&#123;</span><br><span class="line">    a.n +&#x3D; 1</span><br><span class="line">    &#x2F;&#x2F; return 新的 a.n</span><br><span class="line">    return a.n</span><br><span class="line">  &#125;</span><br><span class="line">&#125;.call()</span><br><span class="line">&#x2F;&#x2F; 匿名函数可以操作函数外面的变量 a ，这就是闭包</span><br><span class="line">&#x2F;&#x2F; 另一个立即执行函数通过 window 访问</span><br><span class="line">! function()&#123;</span><br><span class="line">  var b &#x3D; window.nAdd1()</span><br><span class="line">  console.log(newN)</span><br><span class="line">&#125;.call() &#x2F;&#x2F; 2</span><br></pre></td></tr></table></figure>
+
+<p><strong>IIFE 使得 a 成为局部变量而无法被外部访问<br>闭包使得匿名函数可以操作 a<br>window.nAdd1 保存了匿名函数的地址<br>任何地方都可以使用 window.nAdd1<br>=&gt; 任何地方都可以使用 window.nAdd1 操作 a，但是不能直接访问 a<br>这就是 window 和闭包联合作用的效果</strong></p>
+<h1 id="闭包"><a href="#闭包" class="headerlink" title="闭包"></a>闭包</h1><p>将上面代码整合在一起，就是闭包的常见形式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">function fn()&#123;</span><br><span class="line">  var a &#x3D; &#123;</span><br><span class="line">    n: 1</span><br><span class="line">  &#125;</span><br><span class="line">  function fn2()&#123;</span><br><span class="line">    a.n +&#x3D; 1</span><br><span class="line">    return a.n</span><br><span class="line">  &#125;</span><br><span class="line">  return fn2</span><br><span class="line">&#125;</span><br><span class="line">var fn1 &#x3D; fn()</span><br><span class="line">fn1() &#x2F;&#x2F; 2</span><br><span class="line">&#x2F;&#x2F; 上面代码其实就是</span><br><span class="line">(function()&#123;</span><br><span class="line">  var a &#x3D; &#123;</span><br><span class="line">    n: 1</span><br><span class="line">  &#125;</span><br><span class="line">  return function()&#123;</span><br><span class="line">    a.n +&#x3D; 1</span><br><span class="line">    return a.n</span><br><span class="line">  &#125;</span><br><span class="line">&#125;.call()) &#x2F;&#x2F; IIFE</span><br><span class="line">.call()&#x2F;&#x2F; 2</span><br></pre></td></tr></table></figure>
+
+<p><strong>现在我们明白了为什么闭包一般在 IIFE 里出现</strong><br>IIFE 提供局部变量的环境，才有闭包的用武之地<br><strong>return 的作用</strong><br>上面代码中的 return 和 window 的作用一样，是为了让外部能够访问函数作用域内部的函数，当然 return a.n 的作用也是如此</p>
+<p><strong>而闭包的作用，至此应该理解了</strong></p>
+<hr>
+<p>本文仅作为个人学习使用</p>
+<p>相关参考：<br><a href="http://benalman.com/news/2010/11/immediately-invoked-function-expression/#iife" target="_blank" rel="noopener">Immediately-Invoked Function Expression (IIFE)</a><br><a href="https://zhuanlan.zhihu.com/p/22465092" target="_blank" rel="noopener">「每日一题」什么是立即执行函数？有什么作用？</a><br><a href="https://zhuanlan.zhihu.com/p/22486908" target="_blank" rel="noopener">「每日一题」JS 中的闭包是什么？</a><br><a href="https://wangdoc.com/javascript/types/function.html#%E7%AB%8B%E5%8D%B3%E8%B0%83%E7%94%A8%E7%9A%84%E5%87%BD%E6%95%B0%E8%A1%A8%E8%BE%BE%E5%BC%8F%EF%BC%88iife%EF%BC%89" target="_blank" rel="noopener">JS 标准参考教程——IIFE</a><br><a href="http://es6.ruanyifeng.com/#docs/let#%E5%9D%97%E7%BA%A7%E4%BD%9C%E7%94%A8%E5%9F%9F" target="_blank" rel="noopener">ES6 入门——let#块级作用域</a></p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Zhou Yuanda</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://github.com/Adashuai5/Adashuai5.github.io/2018/08/20/%E4%B8%80%E6%AC%A1%E6%80%A7%E7%90%86%E8%A7%A3%E7%AB%8B%E5%8D%B3%E6%89%A7%E8%A1%8C%E5%87%BD%E6%95%B0%E5%92%8C%E9%97%AD%E5%8C%85/">https://github.com/Adashuai5/Adashuai5.github.io/2018/08/20/%E4%B8%80%E6%AC%A1%E6%80%A7%E7%90%86%E8%A7%A3%E7%AB%8B%E5%8D%B3%E6%89%A7%E8%A1%8C%E5%87%BD%E6%95%B0%E5%92%8C%E9%97%AD%E5%8C%85/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/JavaScript/"># JavaScript</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2018/08/27/%E6%90%9E%E6%87%82%E8%BF%99%E4%BA%9B-%E4%BD%A0%E5%B0%B1%E7%90%86%E8%A7%A3-this-%E4%BA%86/">搞懂这些 你就理解 this 了</a>
+            
+            
+            <a class="next" rel="next" href="/2018/08/18/MVC-%E5%88%9D%E5%B0%9D%E8%AF%95%E4%B9%8B-V-%E5%92%8C-C/">MVC 初尝试之 V 和 C</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Zhou Yuanda | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Zhou Yuanda">
+
+
+    <meta name="subtitle" content="试问谁可，洁白无比？">
+
+
+    <meta name="description" content="当然我也在扯淡。。">
+
+
+    <meta name="keywords" content="前端开发">
+
+
+<title>实现一个 AJAX | Ada 的个人博客主页</title>
+
+
+
+    <link rel="icon" href="/image/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Ada&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Ada&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">实现一个 AJAX</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Zhou Yuanda</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">August 12, 2018&nbsp;&nbsp;12:28:53</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <p><a href="https://www.jianshu.com/p/4591a66c50f5" target="_blank" rel="noopener">AJAX 是什么鬼</a> 续篇</p>
+<h1 id="今天我们给-AJAX-封装一下"><a href="#今天我们给-AJAX-封装一下" class="headerlink" title="今天我们给 AJAX 封装一下"></a>今天我们给 AJAX 封装一下</h1><p>之前写了篇有关用原生 JS 写 jQuery 的<a href="https://www.jianshu.com/p/7e663286cb35" target="_blank" rel="noopener">博客</a><br>下面是相关主要代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">window.jQuery &#x3D; function (nodeOrSelector) &#123;</span><br><span class="line">    let nodes &#x3D; &#123;&#125;</span><br><span class="line">    nodes.addClass &#x3D; function () &#123;&#125;</span><br><span class="line">    nodes.html &#x3D; function () &#123;&#125;</span><br><span class="line">    return nodes</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>事实上就是用函数给代码封装一下并设定相关参数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">window.jQuery.ajax &#x3D; function (url, method, body, succseeFn, failFn) &#123;</span><br><span class="line">    let request &#x3D; new XMLHttpRequest()</span><br><span class="line">    &#x2F;&#x2F;初始化请求</span><br><span class="line">    request.open(method, url)</span><br><span class="line">    request.onreadystatechange &#x3D; () &#x3D;&gt; &#123;</span><br><span class="line">        if (request.readyState &#x3D;&#x3D;&#x3D; 4) &#123;</span><br><span class="line">            if (request.status &gt;&#x3D; 200 &amp;&amp; request.status &lt; 300) &#123;</span><br><span class="line">                succseeFn.call(undefined, request.responseText)</span><br><span class="line">            &#125; else if (request.status &gt;&#x3D; 400) &#123;</span><br><span class="line">                failFn.call(undefined, request)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    request.send(body)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">window.$ &#x3D; window.jQuery</span><br></pre></td></tr></table></figure>
+
+<p>可以使用$.ajax 了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">myButton.addEventListener(&#39;click&#39;, (e) &#x3D;&gt; &#123;</span><br><span class="line">    $.ajax(</span><br><span class="line">        &#39;&#x2F;ada&#39;,</span><br><span class="line">        &#39;post&#39;,</span><br><span class="line">        &#39;a&#x3D;1&amp;b&#x3D;2&#39;,</span><br><span class="line">        (responseText) &#x3D;&gt; &#123;</span><br><span class="line">            console.log(&#39;s&#39;)</span><br><span class="line">        &#125;,</span><br><span class="line">        (request) &#x3D;&gt; &#123;</span><br><span class="line">            console.log(&#39;f&#39;)</span><br><span class="line">        &#125;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p><strong>但是这个$.ajax 依然有问题</strong> 1.给定的参数顺序太死<br>如果我不传其中一个参数，就需要给这个参数所在位置占位，如若 method 是’get’，就不返回 body，那就需要用 undefined 等占位</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#39;&#x2F;ada&#39;,</span><br><span class="line">&#39;post&#39;,</span><br><span class="line">&#x2F;&#x2F;null，undefined或&#39;&#39; 占位</span><br><span class="line">&#39;&#39;,</span><br><span class="line">(responseText) &#x3D;&gt; &#123;</span><br><span class="line">      console.log(&#39;s&#39;)</span><br><span class="line">&#125;,</span><br><span class="line">(request) &#x3D;&gt; &#123;</span><br><span class="line">      console.log(&#39;f&#39;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>2.无法直观解释参数意思。<br>比如上面代码，如果你没看过前面内容或者原生 JS 代码，你都不知道这些参数分别表达的是什么意思。</p>
+<p><strong>解决方法：给参数命名呗</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">window.jQuery.ajax &#x3D; function (options) &#123;</span><br><span class="line">    &#x2F;&#x2F;给参数一个选项</span><br><span class="line">    let method &#x3D; options.method</span><br><span class="line">    let url &#x3D; options.url</span><br><span class="line">    let body &#x3D; options.body</span><br><span class="line">    let succseeFn &#x3D; options.succseeFn</span><br><span class="line">    let failFn &#x3D; options.failFn</span><br><span class="line"></span><br><span class="line">    let request &#x3D; new XMLHttpRequest()</span><br><span class="line">    &#x2F;&#x2F;初始化请求</span><br><span class="line">    request.open(method, url)</span><br><span class="line">    request.onreadystatechange &#x3D; () &#x3D;&gt; &#123;</span><br><span class="line">        if (request.readyState &#x3D;&#x3D;&#x3D; 4) &#123;</span><br><span class="line">            if (request.status &gt;&#x3D; 200 &amp;&amp; request.status &lt; 300) &#123;</span><br><span class="line">                succseeFn.call(undefined, request.responseText)</span><br><span class="line">            &#125; else if (request.status &gt;&#x3D; 400) &#123;</span><br><span class="line">                failFn.call(undefined, request)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    request.send(body)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">myButton.addEventListener(&#39;click&#39;, (e) &#x3D;&gt; &#123;</span><br><span class="line">    &#x2F;&#x2F;以对象的形式传参数</span><br><span class="line">    $.ajax(&#123;</span><br><span class="line">        url: &#39;&#x2F;ada&#39;,</span><br><span class="line">        method: &#39;post&#39;,</span><br><span class="line">        body: &#39;a&#x3D;1&amp;b&#x3D;2&#39;,</span><br><span class="line">        succseeFn: (responseText) &#x3D;&gt; &#123;</span><br><span class="line">            console.log(&#39;s&#39;)</span><br><span class="line">        &#125;,</span><br><span class="line">        failFn: (request) &#x3D;&gt; &#123;</span><br><span class="line">            console.log(&#39;f&#39;)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p><strong>加一个 setRequestHeader：设置请求第二部分</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">headers: &#123;</span><br><span class="line">    &#39;content-type&#39;:&#39;application&#x2F;x-www-form-urlencoded&#39;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>$.ajax 部分遍历一下 headers</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">let headers &#x3D; options.headers</span><br><span class="line">&#x2F;&#x2F;下面代码放在 requset.open() 后</span><br><span class="line">for (let key in headers) &#123;</span><br><span class="line">    let value &#x3D; headers[key]</span><br><span class="line">    request.setRequestHeader(key, value)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://upload-images.jianshu.io/upload_images/7094266-5f2a6c8a84d872fb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""><br><strong>如何向 $.ajax 传两个参数：如 jQuery.ajax( url [, options ] )</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">let url</span><br><span class="line">if(arguments.length &#x3D;&#x3D;&#x3D; 1)&#123;</span><br><span class="line">    url &#x3D; options.url</span><br><span class="line">&#125;else if(arguments.length &#x3D;&#x3D;&#x3D; 2)&#123;</span><br><span class="line">    url &#x3D; arguments[0]</span><br><span class="line">    options &#x3D; arguments[1]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>现在我们的$.ajax 已经和 jQuery 的一样了</p>
+<hr>
+<p><strong>优化一下代码，先不管两个参数那个</strong></p>
+<p><strong>1.ES6 的 <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment" target="_blank" rel="noopener">解构赋值</a></strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;这6行代码太丑了</span><br><span class="line">let url&#x3D; options</span><br><span class="line">let method &#x3D; options.method</span><br><span class="line">let body &#x3D; options.body</span><br><span class="line">let succseeFn &#x3D; options.succseeFn</span><br><span class="line">let failFn &#x3D; options.failFn</span><br><span class="line">let headers &#x3D; options.headers</span><br><span class="line">&#x2F;&#x2F;用ES6解构赋值,上面代码等价于</span><br><span class="line">let &#x3D; &#123;url,method,body,headers,successFn,failFn&#125; &#x3D; options</span><br></pre></td></tr></table></figure>
+
+<p>可以不要 options 了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">window.jQuery.ajax &#x3D; function (&#123;url,method,body,headers,succseeFn,failFn&#125;)&#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>2.Promise，相关知识可以<a href="http://es6.ruanyifeng.com/#docs/promise" target="_blank" rel="noopener">参考</a></strong><br>之前我们给参数命名了，我是知道了这个参数代表什么。<br>但是每个人的命名都会不一样，比如 jQuery 的 ajax 对响应成功的命名就是 success 而我的是 successFn。<br>这对于不熟悉对应文档的人来说，使用十分不便。<br>针对这个问题，就有了 Promise<br>Promise 的形式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">window.Promise &#x3D; function(fn)&#123;</span><br><span class="line">    &#x2F;&#x2F;...</span><br><span class="line">    return &#123;</span><br><span class="line">        then:function()&#123;&#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>用 Promise 函数：resolve,reject 替换 successFn 和 failFn，这个两个参数是 ES6 规定的，这样就不会有上述问题了<br>return new Promise(function(resolve,reject){})</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">window.jQuery.ajax &#x3D; function (&#123;url,method,body,headers&#125;) &#123;</span><br><span class="line">    &#x2F;&#x2F;之前代码返回值是 undefined，我们return一个Promise</span><br><span class="line">    return new Promise(function(resolve,reject)&#123;</span><br><span class="line">        let request &#x3D; new XMLHttpRequest()</span><br><span class="line">    &#x2F;&#x2F;初始化请求</span><br><span class="line">    request.open(method, url)</span><br><span class="line">    for (let key in headers) &#123;</span><br><span class="line">        let value &#x3D; headers[key]</span><br><span class="line">        request.setRequestHeader(key, value)</span><br><span class="line">    &#125;</span><br><span class="line">    request.onreadystatechange &#x3D; () &#x3D;&gt; &#123;</span><br><span class="line">        if (request.readyState &#x3D;&#x3D;&#x3D; 4) &#123;</span><br><span class="line">            if (request.status &gt;&#x3D; 200 &amp;&amp; request.status &lt; 300) &#123;</span><br><span class="line">                &#x2F;&#x2F; successFn 就由 resove 代替了</span><br><span class="line">                resolve.call(undefined, request.responseText)</span><br><span class="line">            &#125; else if (request.status &gt;&#x3D; 400) &#123;</span><br><span class="line">                &#x2F;&#x2F; failFn 就由 reject 代替了</span><br><span class="line">                reject.call(undefined, request)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    request.send(body)</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">window.$ &#x3D; window.jQuery</span><br><span class="line"></span><br><span class="line">myButton.addEventListener(&#39;click&#39;, (e) &#x3D;&gt; &#123;</span><br><span class="line">    &#x2F;&#x2F;以对象的形式传参数</span><br><span class="line">    $.ajax(&#123;</span><br><span class="line">        url: &#39;&#x2F;ada&#39;,</span><br><span class="line">        method: &#39;post&#39;,</span><br><span class="line">        headers: &#123;</span><br><span class="line">            &#39;content-type&#39;: &#39;application&#x2F;x-www-form-urlencoded&#39;,</span><br><span class="line">            &#39;ada&#39;: &#39;18&#39;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;).then(</span><br><span class="line">        &#x2F;&#x2F;成功后执行的代码</span><br><span class="line">        (responseText)&#x3D;&gt;&#123;console.log(responseText)&#125;,</span><br><span class="line">        &#x2F;&#x2F;失败后执行的代码</span><br><span class="line">        (request)&#x3D;&gt;&#123;console.log(request)&#125;</span><br><span class="line">      )</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>then 后再 then</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">.then(</span><br><span class="line">    &#x2F;&#x2F;成功后执行的代码</span><br><span class="line">    (responseText)&#x3D;&gt;&#123;console.log(responseText);return &#39;处理成功&#39;&#125;,</span><br><span class="line">    &#x2F;&#x2F;失败后执行的代码</span><br><span class="line">    (request)&#x3D;&gt;&#123;console.log(request);return &#39;处理失败&#39;&#125;</span><br><span class="line">    ).then(</span><br><span class="line">    &#x2F;&#x2F;上一次成功后的return</span><br><span class="line">    (responseText)&#x3D;&gt;&#123;console.log(responseText)&#125;,</span><br><span class="line">    &#x2F;&#x2F;上一次失败后的return</span><br><span class="line">    (request)&#x3D;&gt;&#123;console.log(request)&#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>可以看下结果<img src="https://upload-images.jianshu.io/upload_images/7094266-46960dc591ffab15.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>完整代码请看 <a href="https://github.com/Adashuai5/node-demo/tree/master/jQuery.AJAX">github</a></p>
+<hr>
+<p>#小记<br><strong>AJAX 的所有功能</strong><br>客户端的 JS 发起请求（浏览器上的）<br>服务端的 JS 发送响应（Node.js 上的）<br><strong>1.JS 可以设置任意请求 header</strong><br>第一部分 request.open(method, url)<br>第二部分 request.setRequstHeader(‘content-type’,’application/x-www-form-urlencoded’)<br>第四部分 request.send(body)<br><strong>2.JS 可以获取任意响应 header</strong><br>第一部分 request.status / request.statusText<br>第二部分 request.getResponseHeader() / request.getAllResponseHeaders()<br>第四部分 request.responseText<br>图解<img src="https://upload-images.jianshu.io/upload_images/7094266-82d62fca23713ea1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p><strong>有关回调 (callback:打电话回来)：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">succseeFn.call(undefined, request.responseText)</span><br><span class="line">&#x2F;&#x2F;这种形式就是回调</span><br><span class="line">succseeFn: () &#x3D;&gt; &#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>promise 的 .then() 和 .then().then() 理解</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">.then(</span><br><span class="line">  fn1,fn2</span><br><span class="line">).then(</span><br><span class="line">  fn3,fn4</span><br><span class="line">  )</span><br></pre></td></tr></table></figure>
+
+<p>.then( , ) 逗号左边为成功执行，右边为失败执行<br>我们可以称第一个： <strong>.then( fn1 , fn2 )</strong>为第一负责人；第二个： <strong>.then( fn3 , fn4 )</strong>为第二负责人<br>第一负责人成功则执行 fn1 ，失败则执行 fn2；第一负责人处理完成处理则第二负责人执行 fn3 ，处理不好（如代码有问题）则执行 fn4</p>
+<hr>
+<p>本文仅供个人学习使用</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Zhou Yuanda</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://github.com/Adashuai5/Adashuai5.github.io/2018/08/12/%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AAAJAX/">https://github.com/Adashuai5/Adashuai5.github.io/2018/08/12/%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AAAJAX/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/JavaScript/"># JavaScript</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2018/08/18/MVC-%E5%88%9D%E5%B0%9D%E8%AF%95%E4%B9%8B-V-%E5%92%8C-C/">MVC 初尝试之 V 和 C</a>
+            
+            
+            <a class="next" rel="next" href="/2018/08/12/%E7%90%86%E8%A7%A3JSONP-%E4%B8%8B/">理解 JSONP 下</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Zhou Yuanda | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

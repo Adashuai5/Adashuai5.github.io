@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Zhou Yuanda">
+
+
+    <meta name="subtitle" content="试问谁可，洁白无比？">
+
+
+    <meta name="description" content="当然我也在扯淡。。">
+
+
+    <meta name="keywords" content="前端开发">
+
+
+<title>windows 7与linux双系统安装（后续） | Ada 的个人博客主页</title>
+
+
+
+    <link rel="icon" href="/image/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Ada&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Ada&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">windows 7与linux双系统安装（后续）</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Zhou Yuanda</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">May 27, 2018&nbsp;&nbsp;0:35:45</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <p>前两天美滋滋得安装了 windows 7 下的 linux 双系统 ubuntu，详情见  <a href="https://zhuanlan.zhihu.com/p/37277742" target="_blank" rel="noopener">链接</a> ，以为从此即将开始愉快的学（zhuang）习（bi）之旅了。没想到接下来就是各种强行熟悉其各种命令的噩梦。。。</p>
+<hr>
+<p>首先是各种无法启动</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/7094266-acbb7fb00b6400ba.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<p>于是我选择各种重装，结果悲剧了。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/7094266-cfe90c6da4aba864.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>每次重启都是这个，崩溃</p>
+<p>于是跟着大神们开始启动救援模式，具体可自行 google“grub rescue”这篇是我写文章时打开的 博客  <a href="http://link.zhihu.com/?target=https%3A//blog.csdn.net/u012234115/article/details/38110613">链接</a></p>
+<p>当我跟着大神们一步步</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">ls （hdx，msdosx）&#x2F;</span><br><span class="line"></span><br><span class="line">set root&#x3D;hdx，msdosx</span><br><span class="line"></span><br><span class="line">set prefix&#x3D;（hdx，msdosx）&#x2F;grub</span><br><span class="line"></span><br><span class="line">insmod normal</span><br><span class="line"></span><br><span class="line">normal</span><br></pre></td></tr></table></figure>
+
+<p>终于成功进入 grub2 界面，即可选择系统（每个人不一样，可以多看看不同博客，有细微差别，我当时尝试了不同格式上述命令，终于属于找到自己电脑的，当你都看完你就都懂了）</p>
+<p>此时问题又来了，我进不了 ubuntu 啊，因为我就是启动不了才发生后续问题的，这个问题至今未解决。。那怎么办，无法更新 grub 就一直会重启出现 grub rescue 啊（鬼知道我打了多少遍上面的命令，相信你懂得）我找了各种解决办法，包括什么用尝试启动 ubuntu 来下载  <a href="http://link.zhihu.com/?target=https%3A//blog.csdn.net/u012260238/article/details/52713724">引导修复（boot repair）</a> ，但是我 ubuntu 无法联网啊，U 盘也没有（上一篇免 U 盘装双系统），还有什么 live cd，都没有不会啊 （上述情况任何一样有都有相应解决方法，可视情况选择，具体我给的链接应该涵盖了）</p>
+<p>在我都打算用 grub rescue 作为引导启动项的时候（每次开机打一遍上面的命令），我发现了新的简便方法，只需用到 EasyBCD（装系统时用到）。由于我们可以进入 grub2 界面进入 windows 系统，因此操作方便（其实之前一直想尝试用 DiskGenius<a href="http://link.zhihu.com/?target=https%3A//blog.csdn.net/pkueecser/article/details/6888392">参考博客</a>重建 MBR 的方法，但是怕 windows 系统也崩溃。。其实一直最担心的是这个，好多数据的。。结果担心是多余）</p>
+<p>了解 MBR GRUB 可参考博客  <a href="http://link.zhihu.com/?target=https%3A//blog.csdn.net/jscese/article/details/36865449">链接</a></p>
+<p>通过 EasyBCD 重建 MBR 解决 grub rescue 的问题具体可参考 博客  <a href="http://link.zhihu.com/?target=https%3A//blog.csdn.net/xuehuafeiwu123/article/details/78829717">链接</a></p>
+<p>当然我的 ubuntu 还没删，万一哪天高兴打算再研究一下，估计不行的话会删尝试虚拟机的方法，不过可能还是用笔记本破釜沉舟直接安装 linux 较好，有空在试吧。</p>
+<p>本次装双系统花了 2 个下午加 3 个晚上，终于成功回到了起点。。。</p>
+<hr>
+<p>本文主要用于个人学习使用，如有侵权请联系我删除。</p>
+<p><strong>参考博客：</strong></p>
+<p><a href="https://blog.csdn.net/xqhrs232/article/details/50967886" target="_blank" rel="noopener">ubuntu 无法启动的解决方法 - CSDN 博客</a><br><a href="https://blog.csdn.net/u012260238/article/details/52713724" target="_blank" rel="noopener">双系统 Ubuntu 引导修复（Boot Repair） - CSDN 博客</a><br><a href="https://blog.csdn.net/pkueecser/article/details/6888392" target="_blank" rel="noopener">Win7 与 Ubuntu 双系统时【卸载 Ubuntu】 - CSDN 博客</a><br><a href="https://blog.csdn.net/xuehuafeiwu123/article/details/78829717" target="_blank" rel="noopener">Win7+Ubuntu 双系统，如何卸载 Ubuntu 系统？ - CSDN 博客</a><br><a href="https://blog.csdn.net/u012234115/article/details/38110613" target="_blank" rel="noopener">删除 linux 系统分区后进 windows 出现 grub rescue（已解决） - CSDN 博客</a><br><a href="https://blog.csdn.net/jscese/article/details/36865449" target="_blank" rel="noopener">Ubuntu–grub rescue 主引导修复 - CSDN 博客</a></p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Zhou Yuanda</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://github.com/Adashuai5/Adashuai5.github.io/2018/05/27/windows-7%E4%B8%8Elinux%E5%8F%8C%E7%B3%BB%E7%BB%9F%E5%AE%89%E8%A3%85%EF%BC%88%E5%90%8E%E7%BB%AD%EF%BC%89/">https://github.com/Adashuai5/Adashuai5.github.io/2018/05/27/windows-7%E4%B8%8Elinux%E5%8F%8C%E7%B3%BB%E7%BB%9F%E5%AE%89%E8%A3%85%EF%BC%88%E5%90%8E%E7%BB%AD%EF%BC%89/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/linux/"># linux</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2018/06/03/%E4%B8%80%E4%BA%9B%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%85%A5%E9%97%A8%E5%AD%A6%E4%B9%A0%E7%9A%84%E7%9F%A5%E8%AF%86%E5%92%8C%E7%BB%86%E8%8A%82/">一些命令行入门学习的知识和细节</a>
+            
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Zhou Yuanda | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

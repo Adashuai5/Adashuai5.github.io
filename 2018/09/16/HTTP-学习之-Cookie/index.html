@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Zhou Yuanda">
+
+
+    <meta name="subtitle" content="试问谁可，洁白无比？">
+
+
+    <meta name="description" content="当然我也在扯淡。。">
+
+
+    <meta name="keywords" content="前端开发">
+
+
+<title>HTTP 学习之 Cookie | Ada 的个人博客主页</title>
+
+
+
+    <link rel="icon" href="/image/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Ada&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Ada&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">HTTP 学习之 Cookie</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Zhou Yuanda</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">September 16, 2018&nbsp;&nbsp;18:43:31</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h2 id="Cookie："><a href="#Cookie：" class="headerlink" title="Cookie："></a>Cookie：</h2><p>今天我们要说的当然不是甜品，而是在 HTTP 协议中使用到的 Cookie 知识<br><code>HTTP Cookie（也叫Web Cookie或浏览器Cookie）是服务器发送到用户浏览器并保存在本地的一小块数据，它会在浏览器下次向同一服务器再发起请求时被携带并发送到服务器上。</code></p>
+<p>我们知道，服务器和客户端（浏览器）之间通过 HTTP 发送请求和响应来交流。<br>但是 HTTP 是<a href="https://en.wikipedia.org/wiki/Stateless_protocol" target="_blank" rel="noopener">无状态协议</a>：这样做当然能够减少服务器负担，服务器不必记录每一次请求和响应的状态，但这严重阻碍了<a href="https://zh.wikipedia.org/wiki/%E4%BA%A4%E4%BA%92%E5%BC%8FWeb%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F" target="_blank" rel="noopener" title="交互式Web应用程序">交互式 Web 应用程序</a>的实现。</p>
+<p><strong>所以就有了 Cookie 技术：在请求和响应的报文中写入 Cookie 信息来控制客户端状态。</strong></p>
+<ul>
+<li>服务器通过 Set-Cookie 响应头设置 Cookie</li>
+<li>浏览器得到 Cookie 之后，每次请求都要带上 Cookie</li>
+<li>服务器发现并读取 Cookie 就知道对应客户端的状态信息</li>
+</ul>
+<p>Cookie 主要用于以下三个方面：</p>
+<ul>
+<li>会话状态管理（如用户登录状态、购物车、游戏分数或其它需要记录的信息）</li>
+<li>个性化设置（如用户自定义设置、主题等）</li>
+<li>浏览器行为跟踪（如跟踪分析用户行为等）</li>
+</ul>
+<p><strong>通过 HTTP 协议和 Cookie 技术的协同作用，服务器与客户端之间就可以既快速（HTTP 无状态）又可控（Cookie 有状态）得请求和响应并交互了。<br>当然，由于 Cookie 的安全性等问题，有了 Session（服务器的一小块内存）本文不涉及</strong></p>
+<h2 id="在-node-js-服务端中设置响应头的-Set-Cookie（以用户的-email-为例）代码示例-API-详情"><a href="#在-node-js-服务端中设置响应头的-Set-Cookie（以用户的-email-为例）代码示例-API-详情" class="headerlink" title="在 node.js 服务端中设置响应头的 Set Cookie（以用户的 email 为例）代码示例 API 详情"></a>在 node.js 服务端中设置响应头的 Set Cookie（以用户的 email 为例）代码示例 <a href="https://nodejs.org/dist/latest-v8.x/docs/api/http.html#http_response_setheader_name_value" target="_blank" rel="noopener">API 详情</a></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">response.setHeader(&#39;Set-Cookie&#39;,&#96;sign_in_email &#x3D; $&#123;email&#125;&#96;)</span><br></pre></td></tr></table></figure>
+
+<p>(这是我写的关于登录注册 demo 里登录请求成功的服务端响应 Cookie 内容部分，完整的代码有兴趣可以看我 <a href="https://github.com/Adashuai5/node-demo/tree/master/cookie-demo">github</a>，有关 node.js 搭建简单的服务器的内容可以看我相关博客)</p>
+<p>如图当 <a href="mailto:1@ada.com">1@ada.com</a> 用户发送登录请求成功，服务器返回响应的响应头（Response Headers）内出现 Set - Cookie <img src="https://upload-images.jianshu.io/upload_images/7094266-fdff2ea48f36c28e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="">其他页面（只要是同源域名）都将带上 Cookie 信息（这里我们并没有设置其他内容）<img src="https://upload-images.jianshu.io/upload_images/7094266-341585400a01ecf2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""><br>设置多个 Cookies</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">response.setHeader(&#39;Set-Cookie&#39;, [&#96;sign_in_email &#x3D; $&#123;email&#125;&#96;, &#39;language&#x3D;javascript&#39;]);</span><br></pre></td></tr></table></figure>
+
+<p>在开发者工具里的 Application 界面里有 Cookies 我们可以随意设置其 cookie <img src="http://upload-images.jianshu.io/upload_images/7094266-637c2da4867f4daf?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<h2 id="Set-Cookie-字段还可以附加-Cookie-的属性-MDN"><a href="#Set-Cookie-字段还可以附加-Cookie-的属性-MDN" class="headerlink" title="Set-Cookie 字段还可以附加 Cookie 的属性 MDN"></a>Set-Cookie 字段还可以附加 Cookie 的属性 <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Set-Cookie" target="_blank" rel="noopener">MDN</a></h2><p><img src="https://upload-images.jianshu.io/upload_images/7094266-479fc61fdf79ed54.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="常用属性"><br><strong>多个属性之间用 ; 连接，下面代码添加了 Secure 和 HttpOnly 属性</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">response.setHeader(&#39;Set-Cookie&#39;,&#96;sign_in_email &#x3D; $&#123;email&#125;;Secure;HttpOnly&#96;)</span><br></pre></td></tr></table></figure>
+
+<p><strong>可以通过设置 Set-Cookie 的 Max-Age 属性 和 Expires 属性</strong><br>以 node.js 为例</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">response.setHeader(&#39;Set-Cookie&#39;,&#39; Max-Age&#x3D;1000; Expires&#x3D;Sun, 16 Sep 2018 10:05:35 GMT&#39;)</span><br></pre></td></tr></table></figure>
+
+<p>上面代码设置了响应头在 1000 秒后 cookie 失效，同时指定了 Expires 和 Max-Age，那么 Max-Age 的值将优先生效</p>
+<p>关闭 session（会话）即可删除内存 Cookie；上述过期时间达到则会删除硬盘 Cookie，因此可以通过设置过期时间删除 Cookie<br>我们还可以通过手动清除浏览器 Cookie 及缓存删除 cookie</p>
+<p><strong>相关内容可以参考<br><a href="http://javascript.ruanyifeng.com/bom/cookie.html#toc4" target="_blank" rel="noopener">Cookie 的属性</a><br><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Cookies" target="_blank" rel="noopener">HTTP Cookie</a><br><a href="https://zh.wikipedia.org/wiki/Cookie" target="_blank" rel="noopener">Cookie-wikipedia</a><br>同时这也是本文参考内容，另外还参考了 《图解 HTTP》相关章节</strong></p>
+<hr>
+<p>本文仅供个人学习使用</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Zhou Yuanda</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://github.com/Adashuai5/Adashuai5.github.io/2018/09/16/HTTP-%E5%AD%A6%E4%B9%A0%E4%B9%8B-Cookie/">https://github.com/Adashuai5/Adashuai5.github.io/2018/09/16/HTTP-%E5%AD%A6%E4%B9%A0%E4%B9%8B-Cookie/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/HTTP/"># HTTP</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2018/09/27/%E7%90%86%E8%A7%A3%E8%99%9A%E6%8B%9F-DOM/">理解虚拟 DOM</a>
+            
+            
+            <a class="next" rel="next" href="/2018/09/10/CSS%E5%B8%B8%E7%94%A8%E5%B8%83%E5%B1%80-%E7%BB%AD%E7%AF%87/">CSS 常用布局 续篇</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Zhou Yuanda | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

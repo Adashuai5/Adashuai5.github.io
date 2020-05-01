@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Zhou Yuanda">
+
+
+    <meta name="subtitle" content="试问谁可，洁白无比？">
+
+
+    <meta name="description" content="当然我也在扯淡。。">
+
+
+    <meta name="keywords" content="前端开发">
+
+
+<title>正则表达式速记 | Ada 的个人博客主页</title>
+
+
+
+    <link rel="icon" href="/image/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Ada&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Ada&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">正则表达式速记</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Zhou Yuanda</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">October 28, 2018&nbsp;&nbsp;14:15:51</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>如何学习：<a href="https://luke0922.gitbooks.io/learnregularexpressionin30minutes/content/chapter8.html" target="_blank" rel="noopener">30 分钟入门正则表达式</a><br><a href="https://www.regexpal.com/" target="_blank" rel="noopener">工具</a><br>本文参（zhao）考（chao）<a href="https://wangdoc.com/javascript/stdlib/regexp.html" target="_blank" rel="noopener">RegExp 对象</a>，该笔记只为速查</p>
+<h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>正则表达式（regular expression）是用于匹配字符串中字符组合的模式。在 JavaScript 中，正则表达式也是对象，其体系参照 Perl 5 建立。</p>
+<h1 id="创建正则表达式的方法"><a href="#创建正则表达式的方法" class="headerlink" title="创建正则表达式的方法"></a>创建正则表达式的方法</h1><ol>
+<li>使用一个正则表达式字面量</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">var re &#x3D; &#x2F;xxx&#x2F;</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>调用 RegExp 对象的构造函数</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">var re &#x3D; new RegExp(&#39;xxx&#39;)</span><br></pre></td></tr></table></figure>
+
+<p>两种方法主要区别是：第一种方法在引擎编译代码时，就会新建正则表达式，第二种方法在运行时新建正则表达式，所以前者的效率较高。而且，前者比较便利和直观，所以实际应用中，基本上都采用字面量定义正则表达式。</p>
+<h1 id="正则表达式的实例属性"><a href="#正则表达式的实例属性" class="headerlink" title="正则表达式的实例属性"></a>正则表达式的实例属性</h1><p>分为两类</p>
+<ol>
+<li>修饰符（只读）<br>RegExp.prototype.ignoreCase：返回一个布尔值，表示是否设置了 i 修饰符。用于忽略字符串大小写。<br>RegExp.prototype.global：返回一个布尔值，表示是否设置了 g 修饰符。用于全局匹配。<br>RegExp.prototype.multiline：返回一个布尔值，表示是否设置了 m 修饰符。用于设置匹配为多行模式。</li>
+<li>其他属性<br>RegExp.prototype.lastIndex：返回一个数值，表示下一次开始搜索的位置。该属性可读写，但是只在进行连续搜索时有意义，详细介绍请看后文。<br>RegExp.prototype.source：返回正则表达式的字符串形式（不包括反斜杠），该属性只读。</li>
+</ol>
+<h1 id="实例方法"><a href="#实例方法" class="headerlink" title="实例方法"></a>实例方法</h1><h2 id="1-RegExp-prototype-test"><a href="#1-RegExp-prototype-test" class="headerlink" title="1. RegExp.prototype.test()"></a>1. RegExp.prototype.test()</h2><p>test 方法返回布尔值，表示当前模式是否能匹配参数字符串</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;a&#x2F;.test(&#39;and&#39;) &#x2F;&#x2F; true</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-RegExp-prototype-exec"><a href="#2-RegExp-prototype-exec" class="headerlink" title="2. RegExp.prototype.exec()"></a>2. RegExp.prototype.exec()</h2><p>exec 方法，用来返回匹配结果<br>如果发现匹配，就返回一个数组，成员是匹配成功的子字符串，否则返回 null</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;a&#x2F;.exec(&#39;adbca&#39;)</span><br></pre></td></tr></table></figure>
+
+<p>如果正则表示式包含圆括号（即含有“组匹配”），则返回的数组会包括多个成员。第一个成员是整个匹配成功的结果，后面的成员就是圆括号对应的匹配成功的组。也就是说，第二个成员对应第一个括号，第三个成员对应第二个括号，以此类推。整个数组的 length 属性等于组匹配的数量再加 1。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">String.prototype.match()：返回一个数组，成员是所有匹配的子字符串。</span><br><span class="line">String.prototype.search()：按照给定的正则表达式进行搜索，返回一个整数，表示匹配开始的位置。</span><br><span class="line">String.prototype.replace()：按照给定的正则表达式进行替换，返回替换后的字符串。</span><br><span class="line">String.prototype.split()：按照给定规则进行字符串分割，返回一个数组，包含分割后的各个成员。</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="字面量字符和元字符"><a href="#字面量字符和元字符" class="headerlink" title="字面量字符和元字符"></a>字面量字符和元字符</h1><h2 id="元字符"><a href="#元字符" class="headerlink" title="元字符"></a>元字符</h2><ol>
+<li>点字符（.)<br>匹配除回车（\r）、换行(\n) 、行分隔符（\u2028）和段分隔符（\u2029）以外的所有字符。</li>
+<li>位置字符</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">^ 表示字符串的开始位置</span><br><span class="line">$ 表示字符串的结束位置</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>选择符（|）<br>表示“或关系”</li>
+<li>转义符<br>匹配元字符本身可以在它们前面加反斜杠<br>构造函数需要两次转义</li>
+<li>特殊字符</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">\cX 表示Ctrl-[X]，其中的X是A-Z之中任一个英文字母，用来匹配控制字符。</span><br><span class="line">[\b] 匹配退格键(U+0008)，不要与\b混淆。</span><br><span class="line">\n 匹配换行键。</span><br><span class="line">\r 匹配回车键。</span><br><span class="line">\t 匹配制表符 tab（U+0009）。</span><br><span class="line">\v 匹配垂直制表符（U+000B）。</span><br><span class="line">\f 匹配换页符（U+000C）。</span><br><span class="line">\0 匹配null字符（U+0000）。</span><br><span class="line">\xhh 匹配一个以两位十六进制数（\x00-\xFF）表示的字符。</span><br><span class="line">\uhhhh 匹配一个以四位十六进制数（\u0000-\uFFFF）表示的 Unicode 字符。</span><br></pre></td></tr></table></figure>
+
+<h1 id="字符类"><a href="#字符类" class="headerlink" title="字符类"></a>字符类</h1><p>字符类（class）表示有一系列字符可供选择，只要匹配其中一个就可以了。所有可供选择的字符都放在方括号内，比如[^xyz] 表示 x、y、z 之中任选一个匹配。</p>
+<ol>
+<li>脱字符（^）：需在字符类第一位<br>表示除了字符类之中的字符，其他字符都可以匹配。只有[^]，就表示匹配一切字符，包括换行符。相比之下，点号作为元字符（.）是不包括换行符的。</li>
+<li>连字符（-）</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[0-9.,]</span><br><span class="line">[0-9a-fA-F]</span><br><span class="line">[a-zA-Z0-9-]</span><br><span class="line">[1-31] &#x2F;&#x2F; 不代表1到31，只代表1到3</span><br></pre></td></tr></table></figure>
+
+<h1 id="预定义模式：某些常见模式的简写方式"><a href="#预定义模式：某些常见模式的简写方式" class="headerlink" title="预定义模式：某些常见模式的简写方式"></a>预定义模式：某些常见模式的简写方式</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">\d 匹配0-9之间的任一数字，相当于[0-9]。</span><br><span class="line">\D 匹配所有0-9以外的字符，相当于[^0-9]。</span><br><span class="line">\w 匹配任意的字母、数字和下划线，相当于[A-Za-z0-9_]。</span><br><span class="line">\W 除所有字母、数字和下划线以外的字符，相当于[^A-Za-z0-9_]。</span><br><span class="line">\s 匹配空格（包括换行符、制表符、空格符等），相等于[ \t\r\n\v\f]。</span><br><span class="line">\S 匹配非空格的字符，相当于[^ \t\r\n\v\f]。</span><br><span class="line">\b 匹配词的边界。</span><br><span class="line">\B 匹配非词边界，即在词的内部</span><br></pre></td></tr></table></figure>
+
+<h1 id="重复类"><a href="#重复类" class="headerlink" title="重复类"></a>重复类</h1><p>模式的精确匹配次数，使用大括号（{}）表示。{n}表示恰好重复 n 次，{n,}表示至少重复 n 次，{n,m}表示重复不少于 n 次，不多于 m 次。</p>
+<h1 id="量词符：设定某个模式出现的次数"><a href="#量词符：设定某个模式出现的次数" class="headerlink" title="量词符：设定某个模式出现的次数"></a>量词符：设定某个模式出现的次数</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">? 问号表示某个模式出现0次或1次，等同于&#123;0, 1&#125;。</span><br><span class="line">* 星号表示某个模式出现0次或多次，等同于&#123;0,&#125;。</span><br><span class="line">+ 加号表示某个模式出现1次或多次，等同于&#123;1,&#125;。</span><br></pre></td></tr></table></figure>
+
+<h1 id="贪婪模式"><a href="#贪婪模式" class="headerlink" title="贪婪模式"></a>贪婪模式</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var s &#x3D; &#39;aaa&#39;;</span><br><span class="line">s.match(&#x2F;a+&#x2F;) &#x2F;&#x2F; [&quot;aaa&quot;]</span><br></pre></td></tr></table></figure>
+
+<p>贪婪模式改为非贪婪模式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">*?：表示某个模式出现0次或多次，匹配时采用非贪婪模式。</span><br><span class="line">+?：表示某个模式出现1次或多次，匹配时采用非贪婪模式。</span><br></pre></td></tr></table></figure>
+
+<h1 id="字符串去空格-replace"><a href="#字符串去空格-replace" class="headerlink" title="字符串去空格(replace)"></a>字符串去空格(replace)</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">var str &#x3D; &#39;  #id div.class  &#39;;</span><br><span class="line">str.trim() &#x2F;&#x2F; &quot;#id div.class&quot;</span><br><span class="line">str.replace(&#x2F;^\s+|\s+$&#x2F;g, &#39;&#39;) &#x2F;&#x2F; &quot;#id div.class&quot;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$&amp;：匹配的子字符串。</span><br><span class="line">$&#96;：匹配结果前面的文本。</span><br><span class="line">$’：匹配结果后面的文本。</span><br><span class="line">$n：匹配成功的第n组内容，n是从1开始的自然数。</span><br><span class="line">$$：指代美元符号$。</span><br></pre></td></tr></table></figure>
+
+<p>多多练习吧</p>
+<hr>
+<p>本文仅供个人学习使用</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Zhou Yuanda</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://github.com/Adashuai5/Adashuai5.github.io/2018/10/28/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E9%80%9F%E8%AE%B0/">https://github.com/Adashuai5/Adashuai5.github.io/2018/10/28/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E9%80%9F%E8%AE%B0/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/RegExp/"># RegExp</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2018/11/02/%E6%B5%85%E8%B0%88JS%E7%BB%A7%E6%89%BF/">浅谈 JS 继承</a>
+            
+            
+            <a class="next" rel="next" href="/2018/09/27/%E7%90%86%E8%A7%A3%E8%99%9A%E6%8B%9F-DOM/">理解虚拟 DOM</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Zhou Yuanda | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

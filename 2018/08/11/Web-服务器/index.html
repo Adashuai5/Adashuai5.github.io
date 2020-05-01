@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Zhou Yuanda">
+
+
+    <meta name="subtitle" content="试问谁可，洁白无比？">
+
+
+    <meta name="description" content="当然我也在扯淡。。">
+
+
+    <meta name="keywords" content="前端开发">
+
+
+<title>Web 服务器 | Ada 的个人博客主页</title>
+
+
+
+    <link rel="icon" href="/image/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Ada&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Ada&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">Web 服务器</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Zhou Yuanda</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">August 11, 2018&nbsp;&nbsp;17:21:53</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <p><a href="https://segmentfault.com/a/1190000006879700" target="_blank" rel="noopener">从输入 URL 到页面加载发生了什么</a></p>
+<h2 id="什么是-Web-服务器"><a href="#什么是-Web-服务器" class="headerlink" title="什么是 Web 服务器"></a>什么是 Web 服务器</h2><p>Web 服务器就是一个软件，这个软件监听某个端口。当一个 HTTP 请求到达这个端口后这个软件会接收到，根据请求的 url 和参数发送响应数据，这些数据可以是：1. 本机文件； 2. 通过可执行程序从数据库获取数据后组装的页面</p>
+<p><strong>让我们用 node 搭建一个简单的服务器</strong></p>
+<p><a href="https://nodejs.org/dist/latest-v10.x/docs/api/http.html#http_request_end_data_encoding_callback" target="_blank" rel="noopener">代码相关 HTTP 文档</a> 遇到相应 API 再看，不用一个个看，看不完的<br>新建一个名为 server1.js 的代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;通过 require(&#39;http&#39;) 来让服务器支持HTTP协议</span><br><span class="line">var http &#x3D; require(&#39;http&#39;)</span><br><span class="line">&#x2F;&#x2F;创建服务器请求和响应的函数</span><br><span class="line">var server &#x3D; http.createServer(function(request, response)&#123;</span><br><span class="line">  &#x2F;&#x2F;设置一个2秒的计时器</span><br><span class="line">  setTimeout(function()&#123;</span><br><span class="line">    &#x2F;&#x2F;.setHeader设置文件类型编码等</span><br><span class="line">    response.setHeader(&#39;Content-Type&#39;,&#39;text&#x2F;html; charset&#x3D;utf-8&#39;)</span><br><span class="line">    &#x2F;&#x2F;.writeHead返回状态码</span><br><span class="line">    response.writeHead(404, &#39;Not Found&#39;)</span><br><span class="line">    response.write(&#39;&lt;html&gt;&lt;head&gt;&lt;meta charset&#x3D;&quot;gbk&quot; &#x2F;&gt;&lt;&#x2F;head&gt;&#39;)</span><br><span class="line">    response.write(&#39;&lt;body&gt;&#39;)</span><br><span class="line">    response.write(&#39;&lt;h1&gt;你好&lt;&#x2F;h1&gt;&#39;)</span><br><span class="line">    response.write(&#39;&lt;&#x2F;body&gt;&#39;)</span><br><span class="line">    response.write(&#39;&lt;&#x2F;html&gt;&#39;)</span><br><span class="line">    &#x2F;&#x2F;事件&#39;关闭&#39;</span><br><span class="line">    response.end()</span><br><span class="line">  &#125;,2000);</span><br><span class="line">&#125;)</span><br><span class="line">console.log(&#39;open http:&#x2F;&#x2F;localhost:8080&#39;)</span><br><span class="line">&#x2F;&#x2F;listen(端口)产生HTTP服务器监听链接</span><br><span class="line">server.listen(8080)</span><br></pre></td></tr></table></figure>
+
+<p>用命令行打开 server1.js 所在目录，node 开启服务器<img src="https://upload-images.jianshu.io/upload_images/7094266-59e81063d440a373.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""><br>用浏览器打开<a href="http://localhost:8080，2秒后就返回页面拉![](https://upload-images.jianshu.io/upload_images/7094266-7bf0b304614ce83f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)">http://localhost:8080，2秒后就返回页面拉![](https://upload-images.jianshu.io/upload_images/7094266-7bf0b304614ce83f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)</a><br>至此，你已经用 node.js 完成了一个简单的服务器搭建，并用浏览器以<a href="http://localhost:8080向你的服务器发起请求并成功得到响应了">http://localhost:8080向你的服务器发起请求并成功得到响应了</a></p>
+<h3 id="静态服务器"><a href="#静态服务器" class="headerlink" title="静态服务器"></a>静态服务器</h3><p>页面不会变化，展示静态页面<img src="http://upload-images.jianshu.io/upload_images/7094266-19e00ec3472ba838.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"><br><strong>同样用 node 尝试一个简单的静态服务器</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">var http &#x3D; require(&#39;http&#39;)</span><br><span class="line">&#x2F;&#x2F;用来读取内容</span><br><span class="line">var fs &#x3D; require(&#39;fs&#39;)</span><br><span class="line"></span><br><span class="line">var server &#x3D; http.createServer(function(req, res)&#123;</span><br><span class="line">  try&#123;</span><br><span class="line">    &#x2F;&#x2F;.readFileSync 用于同步读取文件:当前目录下的 hi 文件 下的 目标</span><br><span class="line">    var fileContent &#x3D; fs.readFileSync(__dirname + &#39;&#x2F;hi&#39; + req.url)</span><br><span class="line">    res.write(fileContent)</span><br><span class="line">  &#125;catch(e)&#123;</span><br><span class="line">    res.writeHead(404, &#39;not found&#39;)</span><br><span class="line">  &#125;</span><br><span class="line">  res.end()</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">server.listen(8080)</span><br><span class="line">console.log(&#39;visit http:&#x2F;&#x2F;localhost:8080&#39; )</span><br></pre></td></tr></table></figure>
+
+<p>我在 hi 文件下新建了一个 html 文件<img src="https://upload-images.jianshu.io/upload_images/7094266-f1c53aa1769fd9ad.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>命令行<img src="https://upload-images.jianshu.io/upload_images/7094266-9dcba127af327a67.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>这次输入的就是<a href="http://localhost:8080/index.html![](https://upload-images.jianshu.io/upload_images/7094266-986cc0ea222a9586.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)成功拉" target="_blank" rel="noopener">http://localhost:8080/index.html![](https://upload-images.jianshu.io/upload_images/7094266-986cc0ea222a9586.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)成功拉</a></p>
+<h3 id="动态服务器"><a href="#动态服务器" class="headerlink" title="动态服务器"></a>动态服务器</h3><p>有个动态软件，可执行动态页面<img src="http://upload-images.jianshu.io/upload_images/7094266-47d1ffd2b592f7e1.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"><br>这一部分涉及的知识就多了，无法用简单的小示例完整展现，后续应该会有相关博客</p>
+<h3 id="以上例子均为-url-同源"><a href="#以上例子均为-url-同源" class="headerlink" title="以上例子均为 url 同源"></a>以上例子均为 url 同源</h3><p>当浏览器向服务器发送请求时，会遇到<strong>不同源</strong>的情况：（有关浏览器同源的详细概念可以参考<a href="http://www.ruanyifeng.com/blog/2016/04/same-origin-policy.html" target="_blank" rel="noopener">阮一峰博客</a>）<br>不同源两种情况下的规避方法： 1.服务器同意请求：<br>JSONP：需要后端支持（附上我学习 JSONP 的相关<a href="https://www.jianshu.com/p/2a2fe02917e7" target="_blank" rel="noopener">博客</a>）<br>CORS(Cross-Origin Resource Sharing)：跨域资源共享（AJAX 相关<a href="https://www.jianshu.com/p/4591a66c50f5" target="_blank" rel="noopener">博客</a>） 2.服务器不同意请求：<br>利用服务器中转：自己搭建一个服务器，由于服务器访问服务器没有同源要求，可直接访问，自己服务器作为中转，把自己服务器变为情况 1，即可通过访问自己服务器再访问到其他服务器相关内容<br>这方面的知识同样可以参考<br><a href="http://book.jirengu.com/fe/%E5%89%8D%E7%AB%AF%E5%9F%BA%E7%A1%80/Javascript/%E8%B7%A8%E5%9F%9F.html" target="_blank" rel="noopener">饥人谷博客-跨域</a></p>
+<hr>
+<p>本文仅供个人学习使用</p>
+<p>相关参考及资源链接已在文中标注</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Zhou Yuanda</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://github.com/Adashuai5/Adashuai5.github.io/2018/08/11/Web-%E6%9C%8D%E5%8A%A1%E5%99%A8/">https://github.com/Adashuai5/Adashuai5.github.io/2018/08/11/Web-%E6%9C%8D%E5%8A%A1%E5%99%A8/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/Node-js/"># Node.js</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2018/08/12/%E7%90%86%E8%A7%A3JSONP-%E4%B8%8B/">理解 JSONP 下</a>
+            
+            
+            <a class="next" rel="next" href="/2018/08/11/%E7%90%86%E8%A7%A3JSONP-%E4%B8%8A/">理解 JSONP 上</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Zhou Yuanda | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

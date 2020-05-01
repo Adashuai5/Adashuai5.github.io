@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Zhou Yuanda">
+
+
+    <meta name="subtitle" content="试问谁可，洁白无比？">
+
+
+    <meta name="description" content="当然我也在扯淡。。">
+
+
+    <meta name="keywords" content="前端开发">
+
+
+<title>恢复 github 上不显示的绿块 | Ada 的个人博客主页</title>
+
+
+
+    <link rel="icon" href="/image/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Ada&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Ada&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">恢复 github 上不显示的绿块</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Zhou Yuanda</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">July 16, 2018&nbsp;&nbsp;0:50:39</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <p>github 是一个良好的记录自己代码的 git 版本控制平台，看到自己有关的 contributions 的小绿块是件开心的事。但是如果，你的每次 commit 都没有相应的小绿块，是不是很伤感呢。</p>
+<p>之前我的 github 一直存在这个问题，虽然写代码不是为了说有这个小绿块。但是没有的话，commit 的积极性会大受打击。</p>
+<p>最后 google 终于找到了解决方法，原来我 github 绑定的是 qq 邮箱，而 git bash 上保存的 email 地址是谷歌邮箱。（其实之前也搜索到这些答案，但是由于确信当时使用的是谷歌邮箱而一直没有去看，当然或许是没想到。）</p>
+<p>方法是在 github 的 settings 里 Emails 中 Add 你一直错用的邮箱，这样小绿块就回来了，开心，以后又可以愉快得 commit 了</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/7094266-4913eaff0e17eecc.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>注意只有你的终端里绑定的邮箱有效，上面的方法才可行，即你的小绿块记录会回来；如果你用的是无效邮箱，那就只能改终端绑定邮箱为 github 上邮箱来让未来的小绿块不丢失了（或许还有别的找回无效邮箱提交 commit 小绿块的方法，我不知道）有关教程可看我提供参考链接</p>
+<hr>
+<p>本文主要用于个人学习使用，也希望能帮到你</p>
+<p>参考：</p>
+<p><a href="https://blog.csdn.net/Cloudox_/article/details/50284193" target="_blank" rel="noopener">解决提交到 GitHub 首页不显示的问题</a></p>
+<p><a href="https://www.cnblogs.com/dongliu/p/5782329.html" target="_blank" rel="noopener">解决 github 提交 commit,contributions 不统计显示绿色的问题</a></p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Zhou Yuanda</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://github.com/Adashuai5/Adashuai5.github.io/2018/07/16/%E6%81%A2%E5%A4%8Dgithub%E4%B8%8A%E4%B8%8D%E6%98%BE%E7%A4%BA%E7%9A%84%E7%BB%BF%E5%9D%97/">https://github.com/Adashuai5/Adashuai5.github.io/2018/07/16/%E6%81%A2%E5%A4%8Dgithub%E4%B8%8A%E4%B8%8D%E6%98%BE%E7%A4%BA%E7%9A%84%E7%BB%BF%E5%9D%97/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/git/"># git</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2018/07/29/%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA-jQuery-%E7%9A%84-API/">实现一个 jQuery 的 API</a>
+            
+            
+            <a class="next" rel="next" href="/2018/07/12/JavaScript%E5%8E%9F%E5%9E%8B%E5%92%8C%E5%8E%9F%E5%9E%8B%E9%93%BE/">JavaScript 原型和原型链</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Zhou Yuanda | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

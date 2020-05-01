@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Zhou Yuanda">
+
+
+    <meta name="subtitle" content="试问谁可，洁白无比？">
+
+
+    <meta name="description" content="当然我也在扯淡。。">
+
+
+    <meta name="keywords" content="前端开发">
+
+
+<title>OOP 初探（给 MVC 添加类） | Ada 的个人博客主页</title>
+
+
+
+    <link rel="icon" href="/image/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Ada&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Ada&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">OOP 初探（给 MVC 添加类）</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Zhou Yuanda</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">September 2, 2018&nbsp;&nbsp;16:49:17</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="面向对象程序设计：Object-oriented-programming-OOP"><a href="#面向对象程序设计：Object-oriented-programming-OOP" class="headerlink" title="面向对象程序设计：Object-oriented programming(OOP)"></a>面向对象程序设计：Object-oriented programming(OOP)</h1><p><strong>命名空间：name space</strong><br>什么是命名空间？我们来看看 <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Introduction_to_Object-Oriented_JavaScript#%E5%91%BD%E5%90%8D%E7%A9%BA%E9%97%B4" target="_blank" rel="noopener">MDN</a> 的例子</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 全局命名空间</span><br><span class="line">var MYAPP &#x3D; MYAPP || &#123;&#125;;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<p><strong>这里补充有关逻辑运算符的知识</strong><br>逻辑运算符：且（&amp;&amp;）、或（||）<br><strong>&amp;&amp; 运算符返回第一个 falsy 值（停止运算），若无 falsy 值，则返回最后一个 truthy 值</strong><br>只有（0；NaN；null；undefined；空字符串(‘ ‘)）五个是 falsy 值，除此之外其他都是 truthy 值</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">console.log(1) &amp;&amp; 0 &#x2F;&#x2F; 1</span><br></pre></td></tr></table></figure>
+
+<p>注意这里 console.log(1) 是返回值是 undefined （falsy 值），因此直接返回打印结果 1<br>而不是返回第二个 falsy 值 0</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0 &amp;&amp; console.log(n) &#x2F;&#x2F; 0</span><br></pre></td></tr></table></figure>
+
+<p>注意这里不会报错说 Uncaught ReferenceError: n is not defined<br>因为 0 已经是 falsy 值所以直接返回，运算停止后面代码不再执行</p>
+<h2 id="运算符返回第一个-truthy-值（停止运算），若无-truthy-值，则返回最后一个-falsy-值"><a href="#运算符返回第一个-truthy-值（停止运算），若无-truthy-值，则返回最后一个-falsy-值" class="headerlink" title="|| 运算符返回第一个 truthy 值（停止运算），若无 truthy 值，则返回最后一个 falsy 值"></a><strong>|| 运算符返回第一个 truthy 值（停止运算），若无 truthy 值，则返回最后一个 falsy 值</strong></h2><p>因此上面代码等价于</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 首先检查MYAPP是否已经被定义</span><br><span class="line">var MYAPP</span><br><span class="line">&#x2F;&#x2F; 是的话，那么使用现有的MYAPP全局对象</span><br><span class="line">if(MYAPP)&#123;</span><br><span class="line">  MYAPP &#x3D; MYAPP;</span><br><span class="line">&#x2F;&#x2F; 创建一个名为MYAPP的空对象用来封装方法，函数，变量和对象</span><br><span class="line">&#125;else&#123;</span><br><span class="line">  MYAPP &#x3D; &#123;&#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后可以基于 MYAPP 这一 name 的空间来放置所有与 MYAPP 相关的子命名</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 子命名空间</span><br><span class="line">MYAPP.event &#x3D; &#123;&#125;;</span><br><span class="line">MYAPP.commonMethod &#x3D; &#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong><em>在 JavaScript 中，命名空间只是另一个包含 方法，属性，对象 的对象</em></strong><br>我们常见的文件夹就类似一个命名空间</p>
+<hr>
+<p><strong>构造函数：constructor（类：class）</strong><br>JavaScript 基于原型，没有类的概念；但是我们可以定义一个类<br>下面代码就是一个新的类 Person</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">function Person() &#123; &#125;</span><br><span class="line">&#x2F;&#x2F; 或</span><br><span class="line">var Person &#x3D; function()&#123; &#125;</span><br></pre></td></tr></table></figure>
+
+<p>JavaScript 中类的本质是函数，只是它有两个特点：<br><strong>1.函数体内部使用了 this 关键字，代表了所要生成的对象实例。 2.生成对象的时候，必须使用 new 命令<br>这两个特点就形成了所谓的构造函数</strong><br><em>为了与普通函数区别，构造函数名字的第一个字母通常大写，如这里的 Person</em></p>
+<p><strong>对象（类的实例）</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">function Person() &#123; &#125;</span><br><span class="line">var person1 &#x3D; new Person();</span><br><span class="line">var person2 &#x3D; new Person();</span><br></pre></td></tr></table></figure>
+
+<p>以 Person 为类（模版），person1 和 person2 是 Person 新的实例：person1、person2 可以调用函数 Person</p>
+<h1 id="为什么会有面向对象编程？"><a href="#为什么会有面向对象编程？" class="headerlink" title="为什么会有面向对象编程？"></a>为什么会有面向对象编程？</h1><p>你写了一个 person1 ，又写了一个 person2 ，然后又写了一个 person3 。。。<br>它们有很多重复的代码：这些代码结构一致（如我们之前的 <a href="https://zhuanlan.zhihu.com/p/42366912" target="_blank" rel="noopener">MVC 设计模式</a>），简直浪费内存（内存条那么贵）<br><strong>于是就有了 Person 这个构造函数作为对象的模板：把所有相同结构的代码用一个函数封装起来<br>可以让 person1 等只需要用 new 的方法调用这个 Person 传入参数来使用它的模版，person1 自身属性，再单独罗列即可</strong></p>
+<p><strong>下面以之前有关 MVC 的 <a href="https://zhuanlan.zhihu.com/p/42366912" target="_blank" rel="noopener">博客</a> 中的代码为例</strong><br>原来代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line">! function () &#123;</span><br><span class="line">    &#x2F;&#x2F; MVC 的 V</span><br><span class="line">    var view &#x3D; document.querySelector(&#39;section.message&#39;)</span><br><span class="line">    &#x2F;&#x2F;添加 M</span><br><span class="line">    var model &#x3D; &#123;</span><br><span class="line">        init: function () &#123;</span><br><span class="line">            var APP_ID &#x3D; &#39;2zeITbbU6cgHT0mdBscQtmp0-gzGzoHsz&#39;</span><br><span class="line">            var APP_KEY &#x3D; &#39;iByF5Dy55tJodAoxC4cxwAwx&#39;</span><br><span class="line"></span><br><span class="line">            AV.init(&#123;</span><br><span class="line">                appId: APP_ID,</span><br><span class="line">                appKey: APP_KEY</span><br><span class="line">            &#125;)</span><br><span class="line">        &#125;,</span><br><span class="line">        &#x2F;&#x2F;获取所有数据</span><br><span class="line">        fetch: function () &#123;</span><br><span class="line">            var query &#x3D; new AV.Query(&#39;Message&#39;)</span><br><span class="line">            return query.find() &#x2F;&#x2F;Promise 对象</span><br><span class="line">        &#125;,</span><br><span class="line">        &#x2F;&#x2F;创建数据</span><br><span class="line">        save: function (name,content) &#123;</span><br><span class="line">            var Message &#x3D; AV.Object.extend(&#39;Message&#39;);</span><br><span class="line">            var message &#x3D; new Message();</span><br><span class="line">            return message.save(&#123; &#x2F;&#x2F;Promise 对象</span><br><span class="line">                name: name,</span><br><span class="line">                content: content</span><br><span class="line">            &#125;)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    &#x2F;&#x2F; MVC 的 C</span><br><span class="line">    var controller &#x3D; &#123;</span><br><span class="line">        view: null,</span><br><span class="line">        model: null,</span><br><span class="line">        messageList: null,</span><br><span class="line">        init: function (view, model) &#123;</span><br><span class="line">            this.view &#x3D; view</span><br><span class="line">            this.model &#x3D; model</span><br><span class="line">            this.messageList &#x3D; view.querySelector(&#39;#messageList&#39;)</span><br><span class="line">            this.form &#x3D; view.querySelector(&#39;form&#39;)</span><br><span class="line">            this.model.init()</span><br><span class="line">            this.loadMessages()</span><br><span class="line">            this.bindEvents()</span><br><span class="line">        &#125;,</span><br><span class="line">        loadMessages: function () &#123;</span><br><span class="line">            this.model.fetch().then((messages) &#x3D;&gt; &#123;</span><br><span class="line">                let array &#x3D; messages.map((item) &#x3D;&gt; item.attributes)</span><br><span class="line">                array.forEach((item) &#x3D;&gt; &#123;</span><br><span class="line">                    let li &#x3D; document.createElement(&#39;li&#39;)</span><br><span class="line">                    li.innerText &#x3D; &#96;$&#123;item.name&#125; : $&#123;item.content&#125;&#96;</span><br><span class="line">                    this.messageList.appendChild(li)</span><br><span class="line">                &#125;)</span><br><span class="line">            &#125;)</span><br><span class="line">        &#125;,</span><br><span class="line">        bindEvents: function () &#123;</span><br><span class="line">            this.form.addEventListener(&#39;submit&#39;, (e) &#x3D;&gt; &#123;</span><br><span class="line">                e.preventDefault()</span><br><span class="line">                this.saveMessage()</span><br><span class="line">            &#125;)</span><br><span class="line">        &#125;,</span><br><span class="line">        saveMessage: function () &#123;</span><br><span class="line">            let myForm &#x3D; this.form</span><br><span class="line">            let content &#x3D; myForm.querySelector(&#39;input[name&#x3D;content]&#39;).value</span><br><span class="line">            let name &#x3D; myForm.querySelector(&#39;input[name&#x3D;name]&#39;).value</span><br><span class="line">            this.model.save(name, content).then(function (object) &#123;</span><br><span class="line">                let li &#x3D; document.createElement(&#39;li&#39;)</span><br><span class="line">                li.innerText &#x3D; &#96;$&#123;object.attributes.name&#125; : $&#123;object.attributes.content&#125;&#96;</span><br><span class="line">                let messageList &#x3D; document.querySelector(&#39;#messageList&#39;)</span><br><span class="line">                messageList.appendChild(li)</span><br><span class="line">                myForm.querySelector(&#39;input[name&#x3D;content]&#39;).value &#x3D; &#39;&#39;</span><br><span class="line">                console.log(object)</span><br><span class="line">            &#125;)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    controller.init(view, model)</span><br><span class="line">&#125;.call()</span><br></pre></td></tr></table></figure>
+
+<p><strong>把 M、V、C 三个模版单独分出</strong><br>M 的模版</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; Model 办事，我放心</span><br><span class="line">&#x2F;&#x2F; 通过全局函数 window 引入 Model 便于所有 model 调用</span><br><span class="line">&#x2F;&#x2F; 提供三个参数：Options、resourceName 和 object</span><br><span class="line">window.Model &#x3D; function (Options) &#123;</span><br><span class="line">    let resourceName &#x3D; Options.resourceName</span><br><span class="line">    return &#123;</span><br><span class="line">        init: function () &#123;</span><br><span class="line">            var APP_ID &#x3D; &#39;2zeITbbU6cgHT0mdBscQtmp0-gzGzoHsz&#39;</span><br><span class="line">            var APP_KEY &#x3D; &#39;iByF5Dy55tJodAoxC4cxwAwx&#39;</span><br><span class="line"></span><br><span class="line">            AV.init(&#123;</span><br><span class="line">                appId: APP_ID,</span><br><span class="line">                appKey: APP_KEY</span><br><span class="line">            &#125;)</span><br><span class="line">        &#125;,</span><br><span class="line">        fetch: function () &#123;</span><br><span class="line">            var query &#x3D; new AV.Query(resourceName)</span><br><span class="line">            return query.find()</span><br><span class="line">        &#125;,</span><br><span class="line">        &#x2F;&#x2F;创建数据</span><br><span class="line">        save: function (object) &#123;</span><br><span class="line">            var X &#x3D; AV.Object.extend(resourceName)</span><br><span class="line">            var x &#x3D; new X();</span><br><span class="line">            return x.save(object)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>V 就比较简单了，就一句话，但是封装后也可以调用以便减少代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">window.View &#x3D; function(Selector)&#123;</span><br><span class="line">    return document.querySelector(Selector)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里 C 是有一定难点的，需要对 this 的概念有所理解</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">window.Controller &#x3D; function (options) &#123;</span><br><span class="line">    var init &#x3D; options.init &#x2F;&#x2F;这个 init 就是 controller 传进来的，记为 initB</span><br><span class="line">    &#x2F;&#x2F; 4-21 return 一个 object</span><br><span class="line">    let object &#x3D; &#123;</span><br><span class="line">        view: null,</span><br><span class="line">        model: null,</span><br><span class="line">        init: function (view, model) &#123; &#x2F;&#x2F; 注意这里的 init 是 object 的属性,记为 initA</span><br><span class="line">            this.view &#x3D; view</span><br><span class="line">            this.model &#x3D; model</span><br><span class="line">            this.model.init()</span><br><span class="line">            &#x2F;&#x2F; 3.initB.call(this)</span><br><span class="line">            init.call(this, view, model) &#x2F;&#x2F; 这里的 init 当然是 initB，写成这样 init(view,model) 你就懂了</span><br><span class="line">            this.bindEvents.call(this)</span><br><span class="line">        &#125;,</span><br><span class="line">    &#125;</span><br><span class="line">    &#x2F;&#x2F; 把除 init 外的所有 options 的参数传给 object</span><br><span class="line">    &#x2F;&#x2F; init 是公共参数，而其他实例独有的参数需要传进来</span><br><span class="line">    for (let key in options) &#123;</span><br><span class="line">        if (key !&#x3D;&#x3D; &#39;init&#39;) &#123;</span><br><span class="line">            object[key] &#x3D; options[key]</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return object</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>实例代码：现在可以直接调用 M、V、C 了，其他实例也是一样的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">! function () &#123;</span><br><span class="line">	&#x2F;&#x2F; MVC 的 V</span><br><span class="line">	&#x2F;&#x2F; 这里 window.View 的 window 可以省略，是默认的</span><br><span class="line">	var view &#x3D; View(&#39;section.message&#39;)</span><br><span class="line">	&#x2F;&#x2F;添加 M</span><br><span class="line">	var model &#x3D; Model(&#123;</span><br><span class="line">		resourceName: &#39;Message&#39;</span><br><span class="line">	&#125;)</span><br><span class="line">	&#x2F;&#x2F; MVC 的 C</span><br><span class="line">	&#x2F;&#x2F; 1.controller &#x3D;&#x3D;&#x3D; object</span><br><span class="line">	var controller &#x3D; Controller(&#123;</span><br><span class="line">		init: function () &#123;</span><br><span class="line">			this.messageList &#x3D; view.querySelector(&#39;#messageList&#39;)</span><br><span class="line">			this.form &#x3D; view.querySelector(&#39;form&#39;)</span><br><span class="line">			this.loadMessages()</span><br><span class="line">			&#x2F;&#x2F; 这里的 this 是 object，但是 object 没有上面参数</span><br><span class="line">			&#x2F;&#x2F; 所以才要 for...in...遍历一下，让 object 有这些 controller 独有的参数</span><br><span class="line">		&#125;,</span><br><span class="line">		loadMessages: function () &#123;</span><br><span class="line">			this.model.fetch().then((messages) &#x3D;&gt; &#123;</span><br><span class="line">				let array &#x3D; messages.map((item) &#x3D;&gt; item.attributes)</span><br><span class="line">				array.forEach((item) &#x3D;&gt; &#123;</span><br><span class="line">					let li &#x3D; document.createElement(&#39;li&#39;)</span><br><span class="line">					li.innerText &#x3D; &#96;$&#123;item.name&#125; : $&#123;item.content&#125;&#96;</span><br><span class="line">					this.messageList.appendChild(li)</span><br><span class="line">				&#125;)</span><br><span class="line">			&#125;)</span><br><span class="line">		&#125;,</span><br><span class="line">		bindEvents: function () &#123;</span><br><span class="line">			this.form.addEventListener(&#39;submit&#39;, (e) &#x3D;&gt; &#123;</span><br><span class="line">				e.preventDefault()</span><br><span class="line">				this.saveMessage()</span><br><span class="line">			&#125;)</span><br><span class="line">		&#125;,</span><br><span class="line">		saveMessage: function () &#123;</span><br><span class="line">			let myForm &#x3D; this.form</span><br><span class="line">			let content &#x3D; myForm.querySelector(&#39;input[name&#x3D;content]&#39;).value</span><br><span class="line">			let name &#x3D; myForm.querySelector(&#39;input[name&#x3D;name]&#39;).value</span><br><span class="line">			this.model.save(&#123;</span><br><span class="line">				name: name,</span><br><span class="line">				content: content</span><br><span class="line">			&#125;).then(function (object) &#123;</span><br><span class="line">				let li &#x3D; document.createElement(&#39;li&#39;)</span><br><span class="line">				li.innerText &#x3D; &#96;$&#123;object.attributes.name&#125; : $&#123;object.attributes.content&#125;&#96;</span><br><span class="line">				let messageList &#x3D; document.querySelector(&#39;#messageList&#39;)</span><br><span class="line">				messageList.appendChild(li)</span><br><span class="line">				myForm.querySelector(&#39;input[name&#x3D;content]&#39;).value &#x3D; &#39;&#39;</span><br><span class="line">				console.log(object)</span><br><span class="line">			&#125;)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;)</span><br><span class="line">	&#x2F;&#x2F; 2.controller.init(view, model)</span><br><span class="line">	controller.init(view, model)</span><br><span class="line">&#125;.call()</span><br></pre></td></tr></table></figure>
+
+<h1 id="关于-this"><a href="#关于-this" class="headerlink" title="关于 this"></a>关于 this</h1><p>我们以 C：controller 部分封装的代码的 this 为例：所有内容已经在代码中注明，我们来总结一下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">1.controller &#x3D;&#x3D;&#x3D; object</span><br><span class="line">2.controller.init(view, model)</span><br><span class="line">  写成 call 的形式：controller.init.call(controller, view, model)</span><br><span class="line"> &#x2F;&#x2F; MDN 里 this 文档告诉我们：this 是 call 的第一个参数</span><br><span class="line">  显然 controller.init 里面的 this 当然是 controller</span><br><span class="line">  那它还是 object：即 controller.init 里面的 this 就是 object</span><br><span class="line">  相当于 object.init 里面的 this 是 object</span><br><span class="line">3.initB.call(this)</span><br><span class="line">  initB 里面的 this &#x3D;&#x3D;&#x3D; call 后面的this</span><br><span class="line">  call 后面 this &#x3D;&#x3D;&#x3D; 第二条里的 this</span><br><span class="line">  第二条里面的 this &#x3D;&#x3D;&#x3D; object</span><br><span class="line">  &#x3D;&gt; initB 里面的 this 就是 object</span><br></pre></td></tr></table></figure>
+
+<p>想了解更多有关 this 知识，移步 <a href="https://www.jianshu.com/p/bd9d8bd248ab" target="_blank" rel="noopener">搞懂这些 你就理解 this 了</a></p>
+<hr>
+<p>本文仅供个人学习使用</p>
+<p><strong>未完待续。。</strong></p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Zhou Yuanda</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://github.com/Adashuai5/Adashuai5.github.io/2018/09/02/OOP-%E5%88%9D%E6%8E%A2%EF%BC%88%E7%BB%99-MVC-%E6%B7%BB%E5%8A%A0%E7%B1%BB%EF%BC%89/">https://github.com/Adashuai5/Adashuai5.github.io/2018/09/02/OOP-%E5%88%9D%E6%8E%A2%EF%BC%88%E7%BB%99-MVC-%E6%B7%BB%E5%8A%A0%E7%B1%BB%EF%BC%89/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/"># 设计模式</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2018/09/04/AJAX-%E6%98%AF%E4%BB%80%E4%B9%88%E9%AC%BC/">AJAX 是什么鬼</a>
+            
+            
+            <a class="next" rel="next" href="/2018/08/27/%E6%90%9E%E6%87%82%E8%BF%99%E4%BA%9B-%E4%BD%A0%E5%B0%B1%E7%90%86%E8%A7%A3-this-%E4%BA%86/">搞懂这些 你就理解 this 了</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Zhou Yuanda | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

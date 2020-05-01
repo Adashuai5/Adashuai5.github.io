@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Zhou Yuanda">
+
+
+    <meta name="subtitle" content="试问谁可，洁白无比？">
+
+
+    <meta name="description" content="当然我也在扯淡。。">
+
+
+    <meta name="keywords" content="前端开发">
+
+
+<title>AJAX 是什么鬼 | Ada 的个人博客主页</title>
+
+
+
+    <link rel="icon" href="/image/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Ada&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Ada&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">AJAX 是什么鬼</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Zhou Yuanda</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">September 4, 2018&nbsp;&nbsp;20:57:25</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <p>之前写了一篇博客<a href="https://www.jianshu.com/p/2a2fe02917e7" target="_blank" rel="noopener">理解 JSONP 上</a>关于 AJAX 出现之前如何发请求<br>简单回顾一下：</p>
+<h4 id="1-用-form-可以发请求，缺点是会刷新页面或新开页面"><a href="#1-用-form-可以发请求，缺点是会刷新页面或新开页面" class="headerlink" title="1.用 form 可以发请求，缺点是会刷新页面或新开页面"></a>1.用 form 可以发请求，缺点是会刷新页面或新开页面</h4><p>form 发送 get 请求：<img src="https://upload-images.jianshu.io/upload_images/7094266-8a9a80cde134701d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""><br>输入密码后，点击提交，打开开发者工具可以看到一个 get 请求，点开找到 Request Headers 点击<strong>view source</strong> <img src="https://upload-images.jianshu.io/upload_images/7094266-2f497d2ed697fabb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""><br>同样可以用 form 发送 post 请求，与 get 请求区别是 post 请求没有查询参数<img src="https://upload-images.jianshu.io/upload_images/7094266-2a9955c21d5904d5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>post 请求的第四部分 password 在下面的 Form Data 的<strong>view source</strong> 里<img src="https://upload-images.jianshu.io/upload_images/7094266-c10130216b9836f7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<h4 id="2-用-a-可以发-get-请求，但是也会刷新页面或新开页面"><a href="#2-用-a-可以发-get-请求，但是也会刷新页面或新开页面" class="headerlink" title="2.用 a 可以发 get 请求，但是也会刷新页面或新开页面"></a>2.用 a 可以发 get 请求，但是也会刷新页面或新开页面</h4><p>点击 click 就发送请求<img src="https://upload-images.jianshu.io/upload_images/7094266-e8ecdf0d63d5c019.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;a id&#x3D;&quot;ada&quot; href&#x3D;&quot;&#x2F;ada&quot;&gt;click&lt;&#x2F;a&gt;</span><br><span class="line">&#x2F;&#x2F;运行一个脚本，让网页自己点击（但是依然会刷新页面）</span><br><span class="line">&lt;script&gt;</span><br><span class="line">  ada.click()</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-用-img-可以发-get-请求，它不会刷新页面，但是只能以图片的形式展示"><a href="#3-用-img-可以发-get-请求，它不会刷新页面，但是只能以图片的形式展示" class="headerlink" title="3.用 img 可以发 get 请求，它不会刷新页面，但是只能以图片的形式展示"></a>3.用 img 可以发 get 请求，它不会刷新页面，但是只能以图片的形式展示</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;script&gt;</span><br><span class="line">  var image &#x3D; document.createElement(&#39;img&#39;)</span><br><span class="line">  image.src &#x3D; &#39;&#x2F;ada&#39;</span><br><span class="line">  image.onload &#x3D; function()&#123;</span><br><span class="line">    console.log(&#39;succsee&#39;)</span><br><span class="line">  &#125;</span><br><span class="line">  image.onerror &#x3D; function()&#123;</span><br><span class="line">    console.log(&#39;fail&#39;)</span><br><span class="line">  &#125;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://upload-images.jianshu.io/upload_images/7094266-9b2b91b49a0575b4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<h4 id="4-用-link-可以发-get-请求，但是只能以-CSS、favicon-的形式展示"><a href="#4-用-link-可以发-get-请求，但是只能以-CSS、favicon-的形式展示" class="headerlink" title="4.用 link 可以发 get 请求，但是只能以 CSS、favicon 的形式展示"></a>4.用 link 可以发 get 请求，但是只能以 CSS、favicon 的形式展示</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;script&gt;</span><br><span class="line">  var link &#x3D; document.createElement(&#39;link&#39;)</span><br><span class="line">  link.rel &#x3D; &#39;stylesheet&#39;</span><br><span class="line">  link.href &#x3D; &#39;&#x2F;ada&#39;</span><br><span class="line">  &#x2F;&#x2F;需要将link放到页面中才能发送请求</span><br><span class="line">  document.head.appendChild(link)</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://upload-images.jianshu.io/upload_images/7094266-ff9dc05b89603af5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<h4 id="5-用-script-可以发-get-请求，但是只能以脚本的形式运行"><a href="#5-用-script-可以发-get-请求，但是只能以脚本的形式运行" class="headerlink" title="5.用 script 可以发 get 请求，但是只能以脚本的形式运行"></a>5.用 script 可以发 get 请求，但是只能以脚本的形式运行</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;script&gt;</span><br><span class="line">  var script &#x3D; document.createElement(&#39;script&#39;)</span><br><span class="line">  script.src &#x3D; &quot;&#x2F;ada&quot;</span><br><span class="line">  &#x2F;&#x2F;需要将script放到页面中才能发送请求</span><br><span class="line">  document.head.appendChild(script)</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<p>当然还有其他方法</p>
+<hr>
+<p>有关 AJAX 的学习推荐<a href="http://javascript.ruanyifeng.com/bom/ajax.html#toc0" target="_blank" rel="noopener">阮一峰博客</a><br><strong>微软的突破</strong><br>IE 5 率先在 JS 中引入 ActiveX 对象（API），使得 JS 可以直接发起 HTTP 请求。<br>随后 Mozilla、 Safari、 Opera 也跟进了，取名 XMLHttpRequest，并被纳入 W3C 规范<br><strong>AJAX</strong><br>Jesse James Garrett 将如下技术取名叫做 AJAX（Asynchronous JavaScript and XML）：异步的 JavaScript 和 XML<br><strong><em>1.使用 XMLHttpRequest 发请求 2.服务器返回 XML 格式的字符串<br>3.JS 解析 XML，并更新局部页面</em></strong></p>
+<h4 id="同样我们用-node-服务器来尝试一下这三个条件-AJAX"><a href="#同样我们用-node-服务器来尝试一下这三个条件-AJAX" class="headerlink" title="同样我们用 node 服务器来尝试一下这三个条件(AJAX)"></a>同样我们用 node 服务器来尝试一下这三个条件(AJAX)</h4><p>新建 html</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html lang&#x3D;&quot;en&quot;&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;meta charset&#x3D;&quot;UTF-8&quot;&gt;</span><br><span class="line">    &lt;meta name&#x3D;&quot;viewport&quot; content&#x3D;&quot;width&#x3D;device-width, initial-scale&#x3D;1.0&quot;&gt;</span><br><span class="line">    &lt;meta http-equiv&#x3D;&quot;X-UA-Compatible&quot; content&#x3D;&quot;ie&#x3D;edge&quot;&gt;</span><br><span class="line">    &lt;title&gt;Document&lt;&#x2F;title&gt;</span><br><span class="line">&lt;&#x2F;head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">    hi</span><br><span class="line">&lt;&#x2F;body&gt;</span><br><span class="line">&lt;&#x2F;html&gt;</span><br></pre></td></tr></table></figure>
+
+<p>Node 代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">console.log(&#39;含查询字符串的路径\n&#39; + pathWithQuery)</span><br><span class="line">  if (path &#x3D;&#x3D;&#x3D; &#39;&#x2F;&#39;) &#123;</span><br><span class="line">    var string &#x3D; fs.readFileSync(&#39;.&#x2F;index.html&#39;, &#39;utf8&#39;)</span><br><span class="line">    response.statusCode &#x3D; 200</span><br><span class="line">    response.setHeader(&#39;Content-Type&#39;, &#39;text&#x2F;html; charset&#x3D;utf-8&#39;)</span><br><span class="line">    response.write(string)</span><br><span class="line">    response.end()</span><br><span class="line">  &#125; else&#123;</span><br><span class="line">    response.statusCode &#x3D; 404</span><br><span class="line">    response.setHeader(&#39;Content-Type&#39;, &#39;text&#x2F;html; charset&#x3D;utf-8&#39;)</span><br><span class="line">    response.write(&#39;找不到服务器&#39;)</span><br><span class="line">    response.end()</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<p>对于 HTTP 来说，响应的第四部分始终是 string<img src="https://upload-images.jianshu.io/upload_images/7094266-01746a588b0abc36.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""><br>在 html 里创建一个 button，引入当前目录下的 js 文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;button id&#x3D;&quot;myButton&quot;&gt;点我&lt;&#x2F;button&gt;</span><br><span class="line">    &lt;script src&#x3D;&quot;.&#x2F;main.js&quot;&gt;&lt;&#x2F;script&gt;</span><br><span class="line">&lt;&#x2F;body&gt;</span><br></pre></td></tr></table></figure>
+
+<p>Node 代码//在原 Node 代码中插入，下同</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;注意这里是 &#x2F;main.js 而不是 .&#x2F;main.js，因为HTTP请求永远是绝对路径</span><br><span class="line">else if (path &#x3D;&#x3D;&#x3D; &#39;&#x2F;main.js&#39;) &#123;</span><br><span class="line">&#x2F;&#x2F;这里当然是.&#x2F;main.js</span><br><span class="line">    var string &#x3D; fs.readFileSync(&#39;.&#x2F;main.js&#39;, &#39;utf8&#39;)</span><br><span class="line">    response.statusCode &#x3D; 200</span><br><span class="line">    response.setHeader(&#39;Content-Type&#39;, &#39;text&#x2F;javascript; charset&#x3D;utf-8&#39;)</span><br><span class="line">    response.write(string)</span><br><span class="line">    response.end()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>首先满足 1.使用 XMLHttpRequest 发请求</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">myButton.addEventListener(&#39;click&#39;, (e) &#x3D;&gt; &#123;</span><br><span class="line">    let request &#x3D; new XMLHttpRequest()</span><br><span class="line">    &#x2F;&#x2F;初始化请求，参数为:method,url,async(异步状态下才是AJAX),user,password(后三个参数一般默认)</span><br><span class="line">    request.open(&#39;GET&#39;, &#39;&#x2F;ada&#39;)</span><br><span class="line">    request.send()</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p><strong>2.服务器返回 XML 格式的字符串</strong><br>XML 已经不流行了，但是我们依然可以尝试一下<br>找一个一个 XML example</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">else if (path &#x3D;&#x3D;&#x3D; &#39;&#x2F;ada&#39;) &#123;</span><br><span class="line">    response.statusCode &#x3D; 200</span><br><span class="line">    response.setHeader(&#39;Content-Type&#39;, &#39;text&#x2F;xml; charset&#x3D;utf-8&#39;)</span><br><span class="line">    response.write(&#96;</span><br><span class="line">    &lt;?xml version&#x3D;&quot;1.0&quot; encoding&#x3D;&quot;UTF-8&quot;?&gt;</span><br><span class="line">    &lt;note&gt;</span><br><span class="line">    &lt;to&gt;Tove&lt;&#x2F;to&gt;</span><br><span class="line">    &lt;from&gt;Jani&lt;&#x2F;from&gt;</span><br><span class="line">    &lt;heading&gt;Reminder&lt;&#x2F;heading&gt;</span><br><span class="line">    &lt;body&gt;Don&#39;t forget me this weekend!&lt;&#x2F;body&gt;</span><br><span class="line">&lt;&#x2F;note&gt;&#96;)</span><br><span class="line">    response.end()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://upload-images.jianshu.io/upload_images/7094266-d5529f18c6d6d036.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""><br><strong>3.JS 解析 XML，并更新局部页面</strong><br>浏览器是分步下载响应的，一般只要记住 <strong>readyState === 4</strong> 表示请求完成<img src="https://upload-images.jianshu.io/upload_images/7094266-a27d3791360b1d30.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>可以用 <strong>onreadystatechange</strong> 监听 readyState</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">myButton.addEventListener(&#39;click&#39;, (e) &#x3D;&gt; &#123;</span><br><span class="line">    let request &#x3D; new XMLHttpRequest()</span><br><span class="line">    request.onreadystatechange &#x3D; () &#x3D;&gt; &#123;</span><br><span class="line">        if (request.readyState &#x3D;&#x3D;&#x3D; 4) &#123;</span><br><span class="line">            console.log(&#39;请求响应都完成了&#39;)</span><br><span class="line"></span><br><span class="line">            if (request.status &gt;&#x3D; 200 &amp;&amp; request.status &lt; 300) &#123;</span><br><span class="line">                console.log(&#39;success&#39;)</span><br><span class="line">                &#x2F;&#x2F;响应值在300-400之间浏览器会重新发送请求</span><br><span class="line">            &#125; else if (request.status &gt;&#x3D; 400) &#123;</span><br><span class="line">                console.log(&#39;fail&#39;)</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    &#x2F;&#x2F;初始化请求，参数为:method,url,async(异步状态下才是AJAX),user,password(后三个参数一般默认)</span><br><span class="line">    request.open(&#39;GET&#39;, &#39;&#x2F;ada&#39;)</span><br><span class="line">    request.send()</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://upload-images.jianshu.io/upload_images/7094266-6159a07fdb534df4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""><br>如果把(path === ‘/ada’){}里改成 400 //注意不要改错地方</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">response.statusCode &#x3D; 400</span><br></pre></td></tr></table></figure>
+
+<p>当然会返回 fail，可以看到 readyState 是不受状态码影响的<img src="https://upload-images.jianshu.io/upload_images/7094266-dc4181f8240aa1b7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""><br>JS 是可以解析 XML 的，但是现在 XML 已经被 JSON 取代了，我们可以简单打印出来</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">console.log(request.responseText)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://upload-images.jianshu.io/upload_images/7094266-beb53639db92273c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<hr>
+<p><a href="https://www.json.org/" target="_blank" rel="noopener">JSON</a><br>JSON 是道格拉斯基于 JavaScript 发明的数据交换语言</p>
+<ul>
+<li><h2 id="特点："><a href="#特点：" class="headerlink" title="特点："></a>特点：</h2><ul>
+<li>只有 object、array、string、number、true、false、null 这几种类型</li>
+<li>字符串首尾必须为双引号</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">JS         VS         JSON</span><br><span class="line">undefined&#x2F;symbel      无</span><br><span class="line">null                  null</span><br><span class="line">[&#39;a&#39;,&#39;b&#39;]             [&quot;a&quot;,&quot;b&quot;]</span><br><span class="line">function f()&#123;&#125;        无</span><br><span class="line">&#123;a:b&#125;                 &#123;&quot;a&quot;,&quot;b&quot;&#125;</span><br><span class="line">&#39;hello world&#39;         &quot;hello world&quot;</span><br><span class="line">var a &#x3D; &#123;&#125;</span><br><span class="line">a.self &#x3D; a            无法做到&#123;无变量等形式&#125;</span><br><span class="line">&#123;__proto__&#125;           没有原型链</span><br></pre></td></tr></table></figure>
+
+<p><strong>用 JSON 替换 XML</strong><br>Node 代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">else if (path &#x3D;&#x3D;&#x3D; &#39;&#x2F;ada&#39;) &#123;</span><br><span class="line">    response.statusCode &#x3D; 200</span><br><span class="line">    response.setHeader(&#39;Content-Type&#39;, &#39;text&#x2F;xml; charset&#x3D;utf-8&#39;)</span><br><span class="line">&#x2F;&#x2F;变XML为JSON，key和value都可以替换成自己喜欢的</span><br><span class="line">    response.write(&#96;</span><br><span class="line">    &#123;</span><br><span class="line">        &quot;note&quot;:&#123;</span><br><span class="line">        &quot;to&quot;: &quot;reader&quot;,</span><br><span class="line">        &quot;from&quot;: &quot;Ada&quot;,</span><br><span class="line">        &quot;heading&quot;: &quot;greet&quot;,</span><br><span class="line">        &quot;content&quot;: &quot;hello word!&quot;</span><br><span class="line">    &#125;&#96;)</span><br><span class="line">    response.end()</span><br></pre></td></tr></table></figure>
+
+<p>js 完整代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">myButton.addEventListener(&#39;click&#39;, (e) &#x3D;&gt; &#123;</span><br><span class="line">    let request &#x3D; new XMLHttpRequest()</span><br><span class="line">    request.onreadystatechange &#x3D; () &#x3D;&gt; &#123;</span><br><span class="line">        if (request.readyState &#x3D;&#x3D;&#x3D; 4) &#123;</span><br><span class="line">            console.log(&#39;请求响应都完成了&#39;)</span><br><span class="line"></span><br><span class="line">            if (request.status &gt;&#x3D; 200 &amp;&amp; request.status &lt; 300) &#123;</span><br><span class="line">                console.log(&#39;success&#39;)</span><br><span class="line">                console.log(typeof request.responseText)</span><br><span class="line">                console.log(request.responseText)</span><br><span class="line">                let string &#x3D; request.responseText</span><br><span class="line">                &#x2F;&#x2F; 把符合 JSON 语法的字符串转换成 JS 对应的值</span><br><span class="line">                let object &#x3D; window.JSON.parse(string)</span><br><span class="line">                &#x2F;&#x2F; JSON.parse 是浏览器提供的</span><br><span class="line">                &#x2F;&#x2F;响应值在300-400之间浏览器会重新发送请求</span><br><span class="line">            &#125; else if (request.status &gt;&#x3D; 400) &#123;</span><br><span class="line">                console.log(&#39;fail&#39;)</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    &#x2F;&#x2F;初始化请求，参数为:method,url,async(异步状态下才是AJAX),user,password(后三个参数一般默认)</span><br><span class="line">    request.open(&#39;GET&#39;, &#39;&#x2F;ada&#39;)</span><br><span class="line">    request.send()</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://upload-images.jianshu.io/upload_images/7094266-4f376b146466e10d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<hr>
+<h2 id="同源政策"><a href="#同源政策" class="headerlink" title="同源政策"></a>同源政策</h2><p>同源政策规定，AJAX 请求只能发给同源的网址，否则就报错。<br>同源政策的目的，是为了保证用户信息的安全，防止恶意的网站窃取数据。<br>文章开头提到的 form 和 a 等发送请求是没有同源政策的，而 AJAX 是可以读取响应内容的。<br><strong>因此只有 协议+端口+域名 一模一样（同源）才允许发 AJAX 请求</strong></p>
+<hr>
+<h2 id="如何规避同源政策？跨域"><a href="#如何规避同源政策？跨域" class="headerlink" title="如何规避同源政策？跨域"></a>如何规避同源政策？跨域</h2><p>有关 JSONP 跨域在文章开头提供我的博客举过例子<br>这次我们用 <strong>CORS 跨域</strong><br>什么是 CORS:<strong>Cross-Origin Resource Sharing(跨域资源共享)</strong></p>
+<hr>
+<p>同样用<a href="https://www.jianshu.com/p/38a72bd0e37d" target="_blank" rel="noopener">理解 JSONP 下</a>博客中创建过的网站来举例子<br>首先打开服务器端口<img src="https://upload-images.jianshu.io/upload_images/7094266-49fcd7432b2c7d59.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""><br>把请求路径改为</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">request.open(&#39;GET&#39;, &#39;http:&#x2F;&#x2F;jack.com:8002&#x2F;ada&#39;)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://upload-images.jianshu.io/upload_images/7094266-706af4f9ecdace99.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""><br>点击点我<img src="https://upload-images.jianshu.io/upload_images/7094266-7a4b7e5d44756b7e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="">报错了，因为不是同源，响应完成却得不到任何内容</p>
+<p><strong>解决方法，在 Node 代码中加入一句</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;允许 http:&#x2F;&#x2F;ada.com:8001 访问我</span><br><span class="line">response.setHeader(&#39;Access-Control-Allow-Origin&#39;,&#39;http:&#x2F;&#x2F;ada.com:8001&#39;)</span><br></pre></td></tr></table></figure>
+
+<p>点击点我，即可向 ada.com:8001 发送请求并返回 jack.com:8002/ada 的响应内容<img src="https://upload-images.jianshu.io/upload_images/7094266-1797c104e4b05d76.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""><br>这就是用 CORS 实现 AJAX 跨域的过程</p>
+<p>完整代码详见 <a href="https://github.com/Adashuai5/node-demo/tree/master/AJAX-demo">github</a></p>
+<hr>
+<p>本文仅供个人学习使用</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Zhou Yuanda</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://github.com/Adashuai5/Adashuai5.github.io/2018/09/04/AJAX-%E6%98%AF%E4%BB%80%E4%B9%88%E9%AC%BC/">https://github.com/Adashuai5/Adashuai5.github.io/2018/09/04/AJAX-%E6%98%AF%E4%BB%80%E4%B9%88%E9%AC%BC/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/HTTP/"># HTTP</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2018/09/10/CSS%E5%B8%B8%E7%94%A8%E5%B8%83%E5%B1%80-%E7%BB%AD%E7%AF%87/">CSS 常用布局 续篇</a>
+            
+            
+            <a class="next" rel="next" href="/2018/09/02/OOP-%E5%88%9D%E6%8E%A2%EF%BC%88%E7%BB%99-MVC-%E6%B7%BB%E5%8A%A0%E7%B1%BB%EF%BC%89/">OOP 初探（给 MVC 添加类）</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Zhou Yuanda | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

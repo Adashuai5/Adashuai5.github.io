@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Zhou Yuanda">
+
+
+    <meta name="subtitle" content="试问谁可，洁白无比？">
+
+
+    <meta name="description" content="当然我也在扯淡。。">
+
+
+    <meta name="keywords" content="前端开发">
+
+
+<title>有关 HTTP 协议（IP 和端口） | Ada 的个人博客主页</title>
+
+
+
+    <link rel="icon" href="/image/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Ada&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Ada&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">有关 HTTP 协议（IP 和端口）</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Zhou Yuanda</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">June 8, 2018&nbsp;&nbsp;14:51:05</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="网络与-IP"><a href="#网络与-IP" class="headerlink" title="网络与 IP"></a>网络与 IP</h1><p>HTTP 协议的底层其实是由 TCP 协议和 IP 协议（简称 TCP/IP）构建的</p>
+<p><strong>TCP 传输控制协议（Transmission Control Protocol）</strong></p>
+<p><strong>1.<a href="https://www.nowcoder.com/questionTerminal/63c8b45c91a544bd8febc1f1ff02e3b5?toCommentId=73766" target="_blank" rel="noopener">TCP 和 UDP 的区别是什么</a></strong></p>
+<p>简答：TCP 可靠、面向连接、相对 UDP 较慢（求速度）；UDP 不可靠，不面向连接、相对 TCP 较快（求安全）。</p>
+<p>2.<a href="https://github.com/jawil/blog/issues/14">TCP 的三次握手指的是什么</a></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/7094266-5c97dd6f5e872dc1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>简答：每次建立连接前，客户端和服务端之前都要先进行三次对话才开始正式传输内容，三次对话大概是这样的：</p>
+<p>1. 客户端：我要连接你了，可以吗</p>
+<p>2. 服务端：嗯，我准备好了，连接我吧</p>
+<p>3. 客户端：那我连接你咯。</p>
+<p>然后 开始后面步骤</p>
+<hr>
+<p><strong>IP 网络协议（英语：Internet Protocol）</strong></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/7094266-03aaae9c062d73d5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>路由器没有「固定的外网 IP」</p>
+<p>路由器给自己的内网  <strong>IP（192.168.1.1）</strong></p>
+<p>本地** IP：127.0.0.1 **表示设备自己</p>
+<p>特殊的** IP：0.0.0.0 **不表示任何设备</p>
+<h1 id="端口"><a href="#端口" class="headerlink" title="端口"></a>端口</h1><p>你想要访问一个设备（前提是你使用的是 TCP 或 UDP 协议。还记得吗，HTTP 就使用了 TCP），只指定 IP 是不够的，还<strong>必须</strong>指定 端口（Port）</p>
+<p><strong>原则：一个端口对应一个服务</strong></p>
+<p>要提供 HTTP 服务你最好使用 80 端口（能不能使用别的端口？可以，不过不建议你违反约定）</p>
+<p>要提供 HTTPS 服务你最好使用 443 端口（能不能使用别的端口？可以，不过不建议你违反约定）</p>
+<p>要提供 FTP 服务你最好使用 21 端口（能不能使用别的端口？可以，不过不建议你违反约定）</p>
+<p><strong>如何知道用何端口？</strong></p>
+<p>0 到 1023 号端口对应的服务 <a href="https://zh.wikipedia.org/wiki/TCP/UDP%E7%AB%AF%E5%8F%A3%E5%88%97%E8%A1%A8#0.E5.88.B01023.E5.8F.B7.E7.AB.AF.E5.8F.A3" target="_blank" rel="noopener">维基百科</a></p>
+<p><strong>一共由多少端口？</strong></p>
+<p>每个机器一共有 65535（2 的 16 次方减 1）个端口（这是协议规定的）。不过这些端口的使用由一些规定</p>
+<p>0 到 1023（2 的 10 次方减 1）号端口是留给系统使用的，你只有拥有了管理员权限后，才能使用这 1024 个端口。</p>
+<p>其他端口可以给普通用户使用</p>
+<p>如果一个端口正在提供服务，也就是被占用了，那么就不能再使用这个端口。除非你先停掉正在占用这个端口的服务。</p>
+<p><strong>使用 HTTP 协议访问另一个 IP 时，比如同时提供 IP 和端口号，缺一不可</strong></p>
+<p><strong>访问网站时候浏览器帮你加了默认端口号，因此你不需要加也可以访问</strong></p>
+<hr>
+<p>本文主要用于个人学习使用，如有侵权请联系我删除。</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Zhou Yuanda</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://github.com/Adashuai5/Adashuai5.github.io/2018/06/08/%E6%9C%89%E5%85%B3-HTTP-%E5%8D%8F%E8%AE%AE%EF%BC%88IP%E5%92%8C%E7%AB%AF%E5%8F%A3%EF%BC%89/">https://github.com/Adashuai5/Adashuai5.github.io/2018/06/08/%E6%9C%89%E5%85%B3-HTTP-%E5%8D%8F%E8%AE%AE%EF%BC%88IP%E5%92%8C%E7%AB%AF%E5%8F%A3%EF%BC%89/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/HTTP/"># HTTP</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2018/06/11/HTML%E5%85%A5%E9%97%A8%E7%AC%94%E8%AE%B0/">HTML 入门笔记</a>
+            
+            
+            <a class="next" rel="next" href="/2018/06/07/%E7%90%86%E8%A7%A3HTTP/">理解 HTTP</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Zhou Yuanda | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

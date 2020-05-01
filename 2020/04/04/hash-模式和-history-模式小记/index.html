@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Zhou Yuanda">
+
+
+    <meta name="subtitle" content="试问谁可，洁白无比？">
+
+
+    <meta name="description" content="当然我也在扯淡。。">
+
+
+    <meta name="keywords" content="前端开发">
+
+
+<title>【前端路由】这可能是最容易理解的一篇了 | Ada 的个人博客主页</title>
+
+
+
+    <link rel="icon" href="/image/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Ada&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Ada&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">【前端路由】这可能是最容易理解的一篇了</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Zhou Yuanda</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">April 4, 2020&nbsp;&nbsp;16:45:33</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <p>随着 ajax 的流行，异步数据请求体验极具提升，用户得以在不刷新浏览器的情况下进行页面交互，而异步交互体验的更高级版本就是 SPA —— 单页应用。</p>
+<p>单页应用不仅仅是在页面交互时无刷新，连页面跳转都是无刷新的，为了实现单页应用，就有了<strong>前端路由</strong>。</p>
+<h1 id="常用的两种模式"><a href="#常用的两种模式" class="headerlink" title="常用的两种模式"></a>常用的两种模式</h1><p>类似于服务端路由解析对应的 url 路径，返回对应的页面/资源的方式，前端路由实现起来其实也很简单，就是匹配不同的 url 路径，进行解析，然后动态的渲染出区域 html 内容。</p>
+<p>这样自然 url 每次变化的时候，都会造成页面的刷新。</p>
+<p>那么在改变 url 的情况下，如何保证页面的不刷新？</p>
+<h2 id="hash-模式"><a href="#hash-模式" class="headerlink" title="hash 模式"></a>hash 模式</h2><p>在 2014 年之前，大家是通过 hash 来实现路由，url hash 就是类似于：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://www.xxx.com/#/login</span><br></pre></td></tr></table></figure>
+
+<p>这种 # 后面 hash 值的变化，并不会导致浏览器向服务器发出请求，浏览器不发出请求，也就不会刷新页面。</p>
+<h3 id="为什么改变-hash-不刷新页面？——URL的井号‘-’"><a href="#为什么改变-hash-不刷新页面？——URL的井号‘-’" class="headerlink" title="为什么改变 hash 不刷新页面？——URL的井号‘#’"></a>为什么改变 hash 不刷新页面？——<a href="http://www.ruanyifeng.com/blog/2011/03/url_hash.html" target="_blank" rel="noopener">URL的井号‘#’</a></h3><blockquote>
+<p>‘#’ 代表网页中的一个位置，它后面的字符，就是该位置的标识符，它只对浏览器有用，服务器不识别，因此 HTTP 请求不会包含 #</p>
+</blockquote>
+<p>(想要请求 url 包含 # ，可使用 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent" target="_blank" rel="noopener">encodeURIComponent()</a><br>进行部分转义)</p>
+<p><strong>改变 hash ，只会让浏览器滚动到相应位置，不会重载网页</strong></p>
+<p>每次 hash 值的变化，会触发 hashchange 事件，通过<a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Window/onhashchange" target="_blank" rel="noopener"><code>window.onhashchange</code></a>监听该事件我们就可以检测变化的 hash 值来做相应的页面操作。</p>
+<h3 id="简易实现"><a href="#简易实现" class="headerlink" title="简易实现"></a>简易实现</h3><p>接下来我们用最简单的代码实现 hash 模式，仅为了解其思想（你可以直接复制到一个 html 上并通过静态服务器如 <a href="https://www.npmjs.com/package/http-server" target="_blank" rel="noopener">http-server</a> 查看）：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html lang&#x3D;&quot;en&quot;&gt;</span><br><span class="line">  &lt;head&gt;</span><br><span class="line">    &lt;meta charset&#x3D;&quot;UTF-8&quot; &#x2F;&gt;</span><br><span class="line">    &lt;meta name&#x3D;&quot;viewport&quot; content&#x3D;&quot;width&#x3D;device-width, initial-scale&#x3D;1.0&quot; &#x2F;&gt;</span><br><span class="line">    &lt;meta http-equiv&#x3D;&quot;X-UA-Compatible&quot; content&#x3D;&quot;ie&#x3D;edge&quot; &#x2F;&gt;</span><br><span class="line">    &lt;title&gt;Hash 路由&lt;&#x2F;title&gt;</span><br><span class="line">  &lt;&#x2F;head&gt;</span><br><span class="line">  &lt;body&gt;</span><br><span class="line">    &lt;ul&gt;</span><br><span class="line">      &lt;li&gt;&lt;a href&#x3D;&quot;#red&quot;&gt;红色背景&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;</span><br><span class="line">      &lt;li&gt;&lt;a href&#x3D;&quot;#green&quot;&gt;绿色背景&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;</span><br><span class="line">      &lt;li&gt;&lt;a href&#x3D;&quot;#grey&quot;&gt;灰色背景&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;</span><br><span class="line">    &lt;&#x2F;ul&gt;</span><br><span class="line">    &lt;script&gt;</span><br><span class="line">      function watchHash() &#123;</span><br><span class="line">        const hash &#x3D; window.location.hash.slice(1) || &#39;&#x2F;&#39;;</span><br><span class="line">        switch (hash) &#123;</span><br><span class="line">          case &quot;red&quot;:</span><br><span class="line">            document.body.style.background &#x3D; &quot;red&quot;;</span><br><span class="line">            break;</span><br><span class="line">          case &quot;green&quot;:</span><br><span class="line">            document.body.style.background &#x3D; &quot;green&quot;;</span><br><span class="line">            break;</span><br><span class="line">          case &quot;grey&quot;:</span><br><span class="line">            document.body.style.background &#x3D; &quot;grey&quot;;</span><br><span class="line">            break;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      window.addEventListener(&quot;hashchange&quot;, watchHash, false);</span><br><span class="line">      window.addEventListener(&quot;load&quot;, watchHash, false);</span><br><span class="line">    &lt;&#x2F;script&gt;</span><br><span class="line">  &lt;&#x2F;body&gt;</span><br><span class="line">&lt;&#x2F;html&gt;</span><br></pre></td></tr></table></figure>
+
+<h4 id="如何实现最基础的前进后退？"><a href="#如何实现最基础的前进后退？" class="headerlink" title="如何实现最基础的前进后退？"></a>如何实现最基础的前进后退？</h4><p>这里我们简单实现一下后退功能，前进思路类似：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html lang&#x3D;&quot;en&quot;&gt;</span><br><span class="line">  &lt;head&gt;</span><br><span class="line">    &lt;meta charset&#x3D;&quot;UTF-8&quot; &#x2F;&gt;</span><br><span class="line">    &lt;meta name&#x3D;&quot;viewport&quot; content&#x3D;&quot;width&#x3D;device-width, initial-scale&#x3D;1.0&quot; &#x2F;&gt;</span><br><span class="line">    &lt;meta http-equiv&#x3D;&quot;X-UA-Compatible&quot; content&#x3D;&quot;ie&#x3D;edge&quot; &#x2F;&gt;</span><br><span class="line">    &lt;title&gt;Hash 路由&lt;&#x2F;title&gt;</span><br><span class="line">  &lt;&#x2F;head&gt;</span><br><span class="line">  &lt;body&gt;</span><br><span class="line">    &lt;ul&gt;</span><br><span class="line">      &lt;li&gt;&lt;a href&#x3D;&quot;#red&quot;&gt;红色背景&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;</span><br><span class="line">      &lt;li&gt;&lt;a href&#x3D;&quot;#green&quot;&gt;绿色背景&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;</span><br><span class="line">      &lt;li&gt;&lt;a href&#x3D;&quot;#grey&quot;&gt;灰色背景&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;</span><br><span class="line">    &lt;&#x2F;ul&gt;</span><br><span class="line">    &lt;button id&#x3D;&quot;back&quot; disabled&#x3D;&quot;true&quot;&gt;后退&lt;&#x2F;button&gt;</span><br><span class="line">    &lt;script&gt;</span><br><span class="line">      var isGoBack &#x3D; false;</span><br><span class="line">      const history &#x3D; [];</span><br><span class="line">      function watchHash() &#123;</span><br><span class="line">        const hash &#x3D; window.location.hash.slice(1) || &quot;&#x2F;&quot;;</span><br><span class="line">        &#x2F;&#x2F; 防止后退时也记录 hash</span><br><span class="line">        if (!isGoBack &amp;&amp; window.location.hash) &#123;</span><br><span class="line">          history.push(window.location.hash);</span><br><span class="line">        &#125;</span><br><span class="line">        back.disabled &#x3D; history.length &gt; 0 ? false : true;</span><br><span class="line">        console.log(history);</span><br><span class="line">        switch (hash) &#123;</span><br><span class="line">          case &quot;red&quot;:</span><br><span class="line">            document.body.style.background &#x3D; &quot;red&quot;;</span><br><span class="line">            break;</span><br><span class="line">          case &quot;green&quot;:</span><br><span class="line">            document.body.style.background &#x3D; &quot;green&quot;;</span><br><span class="line">            break;</span><br><span class="line">          case &quot;grey&quot;:</span><br><span class="line">            document.body.style.background &#x3D; &quot;grey&quot;;</span><br><span class="line">            break;</span><br><span class="line">          default:</span><br><span class="line">            document.body.style.background &#x3D; &quot;#fff&quot;;</span><br><span class="line">        &#125;</span><br><span class="line">        isGoBack &#x3D; false;</span><br><span class="line">      &#125;</span><br><span class="line">      back.onclick &#x3D; goBack;</span><br><span class="line">      function goBack() &#123;</span><br><span class="line">        isGoBack &#x3D; true;</span><br><span class="line">        if (history.length &gt; 0) &#123;</span><br><span class="line">          history.pop(1);</span><br><span class="line">          window.location.hash &#x3D; history[history.length - 1] || &quot;&quot;;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">          back.disabled &#x3D; true;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      window.addEventListener(&quot;load&quot;, watchHash, false);</span><br><span class="line">      window.addEventListener(&quot;hashchange&quot;, watchHash, false);</span><br><span class="line">    &lt;&#x2F;script&gt;</span><br><span class="line">  &lt;&#x2F;body&gt;</span><br><span class="line">&lt;&#x2F;html&gt;</span><br></pre></td></tr></table></figure>
+
+<p>思路就是通过一个数组记录每次 hashchange 事件的 hash 值，点击后退时取出上一次 hash 值覆盖当前页面的 hash。</p>
+<p>需要注意的是需要区别当前 hash 是后退生成（后退时的 hash 变化不应记录）的还是跳转生成，避免重复记录。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/7094266-a0a5b8004805e7da.gif?imageMogr2/auto-orient/strip" alt="image"></p>
+<h2 id="history-模式"><a href="#history-模式" class="headerlink" title="history 模式"></a>history 模式</h2><p>可以看到，在早期 hash 模式虽然可以实现前端路由，但其后退前进操作就十分麻烦。</p>
+<p>2014 年后，HTML5 引入了 <a href="https://developer.mozilla.org/zh-CN/docs/Web/API/History" target="_blank" rel="noopener">History</a> API，让我们能够快速访问页面历史。</p>
+<p>其中 <a href="https://developer.mozilla.org/en-US/docs/Web/API/History/pushState" target="_blank" rel="noopener">history.pushState()</a> 和 <a href="https://developer.mozilla.org/en-US/docs/Web/API/History/replaceState" target="_blank" rel="noopener">history.replaceState()</a> 方法，它们分别可以添加和修改历史记录条目，通过这两个 API 可以改变 url 地址而无须重新加载页面。</p>
+<p>同时还有 popstate 事件：<br>通过<a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Window/onpopstate" target="_blank" rel="noopener" title="window.onpopstate是popstate事件在window对象上的事件处理程序."><code>window.onpopstate</code></a>可以监听在<strong>浏览器点击后退、前进按钮(或者在 JavaScript 中调用 history.back()、history.forward()、history.go() 方法)</strong> 触发的 popstate 事件。</p>
+<p>通过这些就能用另一种方式来实现前端路由了，但原理都是跟 hash 实现相同的。</p>
+<h3 id="用-history-实现上面-hash-代码"><a href="#用-history-实现上面-hash-代码" class="headerlink" title="用 history 实现上面 hash 代码"></a>用 history 实现上面 hash 代码</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html lang&#x3D;&quot;en&quot;&gt;</span><br><span class="line">  &lt;head&gt;</span><br><span class="line">    &lt;meta charset&#x3D;&quot;UTF-8&quot; &#x2F;&gt;</span><br><span class="line">    &lt;meta name&#x3D;&quot;viewport&quot; content&#x3D;&quot;width&#x3D;device-width, initial-scale&#x3D;1.0&quot; &#x2F;&gt;</span><br><span class="line">    &lt;title&gt;History 路由&lt;&#x2F;title&gt;</span><br><span class="line">  &lt;&#x2F;head&gt;</span><br><span class="line">  &lt;body&gt;</span><br><span class="line">    &lt;ul id&#x3D;&quot;ul&quot;&gt;</span><br><span class="line">      &lt;li&gt;&lt;a href&#x3D;&quot;&#x2F;red&quot;&gt;红色背景&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;</span><br><span class="line">      &lt;li&gt;&lt;a href&#x3D;&quot;&#x2F;green&quot;&gt;绿色背景&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;</span><br><span class="line">      &lt;li&gt;&lt;a href&#x3D;&quot;&#x2F;grey&quot;&gt;灰色背景&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;</span><br><span class="line">    &lt;&#x2F;ul&gt;</span><br><span class="line">    &lt;script&gt;</span><br><span class="line">      const path &#x3D; window.location.pathname;</span><br><span class="line">      history.replaceState(&#123; path: path &#125;, null, path);</span><br><span class="line">      ul.addEventListener(&quot;click&quot;, (e) &#x3D;&gt; &#123;</span><br><span class="line">        if (e.target.tagName &#x3D;&#x3D;&#x3D; &quot;A&quot;) &#123;</span><br><span class="line">          e.preventDefault();</span><br><span class="line">          const path &#x3D; e.target.getAttribute(&quot;href&quot;);</span><br><span class="line">          history.pushState(&#123; path: path &#125;, null, path);</span><br><span class="line">          watchHistory(path);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;);</span><br><span class="line">      function watchHistory() &#123;</span><br><span class="line">        const path &#x3D; window.location.pathname;</span><br><span class="line">        switch (path) &#123;</span><br><span class="line">          case &quot;&#x2F;red&quot;:</span><br><span class="line">            document.body.style.background &#x3D; &quot;red&quot;;</span><br><span class="line">            break;</span><br><span class="line">          case &quot;&#x2F;green&quot;:</span><br><span class="line">            document.body.style.background &#x3D; &quot;green&quot;;</span><br><span class="line">            break;</span><br><span class="line">          case &quot;&#x2F;grey&quot;:</span><br><span class="line">            document.body.style.background &#x3D; &quot;grey&quot;;</span><br><span class="line">            break;</span><br><span class="line">          default:</span><br><span class="line">            document.body.style.background &#x3D; &quot;#fff&quot;;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      window.addEventListener(&quot;popstate&quot;, watchHistory, false);</span><br><span class="line">    &lt;&#x2F;script&gt;</span><br><span class="line">  &lt;&#x2F;body&gt;</span><br><span class="line">&lt;&#x2F;html&gt;</span><br></pre></td></tr></table></figure>
+
+<p>用了 HTML5 的实现，单页路由的 url 就不会多出一个 #，变得更加美观。</p>
+<p><strong>但因为没有 # 号，所以当用户刷新页面之类的操作时，浏览器还是会给服务器发送请求。</strong></p>
+<p>为了避免出现这种情况，history 模式需要服务器的支持，把所有路由都重定向到根页面。</p>
+<h3 id="如何监听-pushState-和-replaceState-的变化"><a href="#如何监听-pushState-和-replaceState-的变化" class="headerlink" title="如何监听 pushState 和 replaceState 的变化"></a>如何监听 pushState 和 replaceState 的变化</h3><p>经过理论及实践我们知道 replaceState()，pushState() 两个 API 不会触发 popstate 监听事件。</p>
+<p>我们可以生成全新的 window 监听事件监听其变化：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">function addListen(type) &#123;</span><br><span class="line">  const source &#x3D; history[type];</span><br><span class="line">  return function () &#123;</span><br><span class="line">    const event &#x3D; new Event(type);</span><br><span class="line">    event.arguments &#x3D; arguments;</span><br><span class="line">    window.dispatchEvent(event);</span><br><span class="line">    return source.apply(this, arguments);</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">history.pushState &#x3D; addListen(&quot;pushState&quot;);</span><br><span class="line">history.replaceState &#x3D; addListen(&quot;replaceState&quot;);</span><br><span class="line"></span><br><span class="line">window.addEventListener(&quot;replaceState&quot;, (e) &#x3D;&gt; &#123;</span><br><span class="line">  console.log(&quot;我监听了 replaceState&quot;);</span><br><span class="line">&#125;);</span><br><span class="line">window.addEventListener(&quot;pushState&quot;, (e) &#x3D;&gt; &#123;</span><br><span class="line">  console.log(&quot;我监听了 pushState&quot;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h1 id="两种模式对比"><a href="#两种模式对比" class="headerlink" title="两种模式对比"></a>两种模式对比</h1><ol>
+<li>无 # 的  history 模式更自然</li>
+<li>history 模式需要 IE9 以上，相对于 hash 模式的 IE8 兼容性差</li>
+<li>history 模式需服务器端配合，反过来说 hash 模式不支持服务端渲染</li>
+</ol>
+<h1 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h1><p>以上就是前端路由的 hash 和 history 两种模式的主要原理及实现思路了，如果你觉得不错，别忘了点个赞😄！</p>
+<hr>
+<p>本文参考：</p>
+<p><a href="https://juejin.im/post/5ac61da66fb9a028c71eae1b" target="_blank" rel="noopener">面试官: 你了解前端路由吗?</a></p>
+<p><a href="https://juejin.im/post/5e85cb8151882573c66cf63f" target="_blank" rel="noopener">阿里P7：你了解路由吗？</a></p>
+<p><a href="https://github.com/webfansplz/article/issues/1">[实践系列]前端路由</a></p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Zhou Yuanda</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://github.com/Adashuai5/Adashuai5.github.io/2020/04/04/hash-%E6%A8%A1%E5%BC%8F%E5%92%8C-history-%E6%A8%A1%E5%BC%8F%E5%B0%8F%E8%AE%B0/">https://github.com/Adashuai5/Adashuai5.github.io/2020/04/04/hash-%E6%A8%A1%E5%BC%8F%E5%92%8C-history-%E6%A8%A1%E5%BC%8F%E5%B0%8F%E8%AE%B0/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/"># 设计模式</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2020/04/09/%E5%A6%82%E6%9E%9C%E8%AE%A9%E4%BD%A0%E5%B1%95%E7%A4%BA%E5%9B%BD%E5%86%85%E5%90%84%E7%9C%81%E5%B8%82%E7%96%AB%E6%83%85%E6%95%B0%E6%8D%AE%E4%BD%A0%E4%BC%9A%E6%80%8E%E4%B9%88%E5%81%9A/">如果让你展示国内各省市疫情数据你会怎么做</a>
+            
+            
+            <a class="next" rel="next" href="/2019/11/14/Vue-%E9%A1%B9%E7%9B%AE%E7%BC%96%E8%AF%91%E6%97%B6%E9%97%B4%E8%BF%87%E9%95%BF%E9%97%AE%E9%A2%98/">Vue 项目编译时间过长问题</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Zhou Yuanda | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

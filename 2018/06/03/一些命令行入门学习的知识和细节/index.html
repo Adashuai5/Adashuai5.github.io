@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Zhou Yuanda">
+
+
+    <meta name="subtitle" content="试问谁可，洁白无比？">
+
+
+    <meta name="description" content="当然我也在扯淡。。">
+
+
+    <meta name="keywords" content="前端开发">
+
+
+<title>一些命令行入门学习的知识和细节 | Ada 的个人博客主页</title>
+
+
+
+    <link rel="icon" href="/image/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Ada&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Ada&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">一些命令行入门学习的知识和细节</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Zhou Yuanda</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">June 3, 2018&nbsp;&nbsp;22:26:58</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="命令行？"><a href="#命令行？" class="headerlink" title="命令行？"></a>命令行？</h1><p>命令行：只有命令，方便</p>
+<p>windows：图形界面</p>
+<p>一个程序员应该学会命令行</p>
+<h2 id="下面是一些简单的知识"><a href="#下面是一些简单的知识" class="headerlink" title="下面是一些简单的知识"></a>下面是一些简单的知识</h2><p>命令行里“目录”（对应 windows 里的“文件夹”）</p>
+<p>命令行一些符号</p>
+<p><strong>~</strong>：用户目录</p>
+<p><strong>/</strong> ：整个硬盘</p>
+<p>*<em>. *</em>：当前目录</p>
+<p>*<em>.. *</em>：副目录</p>
+<p>*<em>&amp; *</em>：提示符号，可以改变</p>
+<p><strong>clear</strong> ：清屏</p>
+<hr>
+<p>输入*<em>ls -l *</em>（查看路径）回车得到如下</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/7094266-bb2e7ac4f4e616ce.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>其中：</p>
+<p><strong>d</strong> ：<strong>directory</strong>表示   目录(文件夹)</p>
+<p><strong>r</strong> ：<strong>read</strong>表示   可读</p>
+<p><strong>w</strong>：<strong>write</strong>表示   可写</p>
+<p><strong>x</strong> ：表示 可执行</p>
+<p>*<em>- *</em>：表示 不可以</p>
+<p>第一组  <strong>rwx</strong>  表示管理员权限，第二组  <strong>rwx</strong>  表示 用户所在组的权限，第三组  <strong>rwx</strong>  是访问权限</p>
+<p><strong>Administer</strong>  表示用户；<strong>197121</strong>  表示用户所在组</p>
+<hr>
+<p>可以用  <strong>touch + 文件名</strong>  创建文件</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/7094266-c9580aa61009e522.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p><strong>echo</strong>  和  *<em>touch *</em>均可用来创建文件</p>
+<p>区别是  <strong>echo</strong>  可以向创建的文件里追加内容** touch**  只用来创建文件且可以改变文件更新时间</p>
+<h2 id="命令行快捷键"><a href="#命令行快捷键" class="headerlink" title="命令行快捷键"></a><strong>命令行快捷键</strong></h2><p>↑ ↓ 上一命令 / 下一命令</p>
+<p>!! 上一命令占位符</p>
+<p><strong>Tab</strong> 自动补全路径</p>
+<p><strong>Alt+.</strong> 上一命令的最后一个参数</p>
+<p><strong>&amp;&amp;</strong> 前面的执行成功了，再执行后面的</p>
+<p><strong>||</strong> 前面的执行失败了，就执行后面的</p>
+<p><strong>;</strong> 前面执行完了，不管成功失败，就执行后面的</p>
+<p><strong>&gt;</strong> 重定向</p>
+<p><strong>|</strong> 管道</p>
+<h2 id="如何使用其他命令行"><a href="#如何使用其他命令行" class="headerlink" title="如何使用其他命令行"></a><strong>如何使用其他命令行</strong></h2><p>常用命令网上很多，谷歌一下就有，那么一些不常用的命令如何知道有哪些用法和其含义</p>
+<p>命令行中查看选项手册<strong>man</strong>：<strong>manual</strong></p>
+<p>windows 中用<strong>–help</strong></p>
+<p>手册内容太长不想看（用此）<a href="https://github.com/tldr-pages/tldr#tldr">tldr</a>：<strong>too long didn’t read</strong></p>
+<p>还可以用这个网页，命令行<a href="https://explainshell.com/" target="_blank" rel="noopener">释义</a></p>
+<p>点开界面如下</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/7094266-0bc203c06c932a7b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<p>在搜索框输入要查询的命令</p>
+<p>如  <strong>ls</strong></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/7094266-a733fcf7a6a0a3a4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<p><strong>list directory contents</strong>  列出目录内容</p>
+<p>有些命令可以有参数，如** ls**  有<strong>-l -a</strong>等</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/7094266-156ca27401e98309.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>是不是很方便？再试试其他的，比如  <strong>mv</strong></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/7094266-e5d1b5db9555a3de.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>*<em>move (rename) files *</em>移动（重命名）文件</p>
+<p>以及  <strong>cat</strong></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/7094266-356bafdb4d657c15.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>*<em>concatenate files and print on the standard output *</em>连接文件并打印到标准输出设备上</p>
+<p>必要时可以参考教程<a href="http://www.runoob.com/linux/linux-comm-cat.html" target="_blank" rel="noopener">cat 菜鸟教程</a></p>
+<hr>
+<p>本文主要用于个人学习使用，如有侵权请联系我删除。</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Zhou Yuanda</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://github.com/Adashuai5/Adashuai5.github.io/2018/06/03/%E4%B8%80%E4%BA%9B%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%85%A5%E9%97%A8%E5%AD%A6%E4%B9%A0%E7%9A%84%E7%9F%A5%E8%AF%86%E5%92%8C%E7%BB%86%E8%8A%82/">https://github.com/Adashuai5/Adashuai5.github.io/2018/06/03/%E4%B8%80%E4%BA%9B%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%85%A5%E9%97%A8%E5%AD%A6%E4%B9%A0%E7%9A%84%E7%9F%A5%E8%AF%86%E5%92%8C%E7%BB%86%E8%8A%82/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E5%91%BD%E4%BB%A4%E8%A1%8C/"># 命令行</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2018/06/03/windows-7%E4%B8%8E-linux-%E5%8F%8C%E7%B3%BB%E7%BB%9F%E5%AE%89%E8%A3%85%EF%BC%88%E5%85%8DU%E7%9B%98%EF%BC%89/">windows 7与 linux 双系统安装（免U盘）</a>
+            
+            
+            <a class="next" rel="next" href="/2018/05/27/windows-7%E4%B8%8Elinux%E5%8F%8C%E7%B3%BB%E7%BB%9F%E5%AE%89%E8%A3%85%EF%BC%88%E5%90%8E%E7%BB%AD%EF%BC%89/">windows 7与linux双系统安装（后续）</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Zhou Yuanda | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Zhou Yuanda">
+
+
+    <meta name="subtitle" content="试问谁可，洁白无比？">
+
+
+    <meta name="description" content="当然我也在扯淡。。">
+
+
+    <meta name="keywords" content="前端开发">
+
+
+<title>搞懂这些 你就理解 this 了 | Ada 的个人博客主页</title>
+
+
+
+    <link rel="icon" href="/image/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Ada&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Ada&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">搞懂这些 你就理解 this 了</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Zhou Yuanda</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">August 27, 2018&nbsp;&nbsp;0:48:41</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <p>新人推荐先看阮大大的书的：<a href="https://wangdoc.com/javascript/oop/this.html#%E6%B6%B5%E4%B9%89" target="_blank" rel="noopener">相关章节</a><br>有关 this 的理解，方老师的这篇 <a href="https://zhuanlan.zhihu.com/p/23804247" target="_blank" rel="noopener">文章</a> 已经很完美了</p>
+<p><strong>你应该已经知道并熟记 this 是 call 的第一个参数</strong><br>下面是一些 this 的特殊情况</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 例 1</span><br><span class="line">button.onclick &#x3D; function f1()&#123;</span><br><span class="line">    console.log(this) &#x2F;&#x2F; 触发事件的元素。  button</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>1 结果：<br>f1.call(???)<br>this 是什么？去看 onclick 的源码呀 -&gt; 做不到<br>MDN 的开发者知道 onclick 的源码<br>MDN 的开发者写了文档<br>看文档呀</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 例 2</span><br><span class="line">button.addEventListener(&#39;click&#39;, function()&#123;</span><br><span class="line">    console.log(this) &#x2F;&#x2F; 该元素的引用 button</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>2 结果：<br>去看 addEventListener 的源码呀 -&gt; 做不到<br>MDN 的开发者知道 addEventListener 的源码<br>MDN 的开发者写了文档<br>看文档呀</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 例 3</span><br><span class="line">$(&#39;ul&#39;).on(&#39;click&#39;, &#39;li&#39; &#x2F;*selector*&#x2F;, function()&#123;</span><br><span class="line">    console.log(this) &#x2F;&#x2F;this 则代表了与 selector 相匹配的元素。</span><br><span class="line">    &#x2F;&#x2F; li 元素</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>3 结果：<br>去看 on 的源码呀 -&gt; 做不到<br>jQuery 的开发者知道 onclick 的源码<br>jQuery 的开发者写了文档<br>看文档呀</p>
+<p><strong>特例：我可以传一个 this 给它</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">button.onclick.call(&#123;name: &#39;ada&#39;&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>由于 this 是 call 的第一个参数<br>这样子 button.onclick 的 this 就变成了 {name:’ada’}</p>
+<p><strong>终极例题</strong><br>理解下面例子，基本上 this 就明白得差不多了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">function X()&#123;</span><br><span class="line">    return object &#x3D; &#123;</span><br><span class="line">        name: &#39;object&#39;,</span><br><span class="line">        options: null,</span><br><span class="line">        f1(x)&#123;</span><br><span class="line">            &#x2F;&#x2F; 3 下面的 this ？不就是 f1.call()的 this，就是 2 里面的 this：object</span><br><span class="line">            this.options &#x3D; x &#x2F;&#x2F; 4 这里 x 是 options</span><br><span class="line">            this.f2() &#x2F;&#x2F; 5 this.f2.call() 显然这里 this 也是 object</span><br><span class="line">        &#125;,</span><br><span class="line">        f2()&#123;</span><br><span class="line">            this.options.f2.call(this) &#x2F;&#x2F; 6 这句代码4告诉我们是 options.f2.call(this) 我们把 this：object 传给了 options （特例）</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var options &#x3D; &#123;</span><br><span class="line">    name: &#39;options&#39;,</span><br><span class="line">    f1()&#123;&#125;,</span><br><span class="line">    f2()&#123;</span><br><span class="line">        console.log(this) &#x2F;&#x2F; 问 this 是啥 ? &#x2F;&#x2F; 7  传过来的 object 啊</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var x &#x3D; X() &#x2F;&#x2F; 1 这里的 x 是啥？X() return 的 object</span><br><span class="line">x.f1(options) &#x2F;&#x2F; 2 x.f1.call(x,options) 显然这里 this 就是 x &#x3D;&#x3D;&#x3D; object</span><br></pre></td></tr></table></figure>
+
+<p>问题：上面代码打印的 this 是什么？<br>正确答案：object ，思路已经在注释里，按数字顺序理解</p>
+<hr>
+<p>参考：<br><a href="https://zhuanlan.zhihu.com/p/25991271" target="_blank" rel="noopener">你怎么还没搞懂 this？</a></p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Zhou Yuanda</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://github.com/Adashuai5/Adashuai5.github.io/2018/08/27/%E6%90%9E%E6%87%82%E8%BF%99%E4%BA%9B-%E4%BD%A0%E5%B0%B1%E7%90%86%E8%A7%A3-this-%E4%BA%86/">https://github.com/Adashuai5/Adashuai5.github.io/2018/08/27/%E6%90%9E%E6%87%82%E8%BF%99%E4%BA%9B-%E4%BD%A0%E5%B0%B1%E7%90%86%E8%A7%A3-this-%E4%BA%86/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/JavaScript/"># JavaScript</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2018/09/02/OOP-%E5%88%9D%E6%8E%A2%EF%BC%88%E7%BB%99-MVC-%E6%B7%BB%E5%8A%A0%E7%B1%BB%EF%BC%89/">OOP 初探（给 MVC 添加类）</a>
+            
+            
+            <a class="next" rel="next" href="/2018/08/20/%E4%B8%80%E6%AC%A1%E6%80%A7%E7%90%86%E8%A7%A3%E7%AB%8B%E5%8D%B3%E6%89%A7%E8%A1%8C%E5%87%BD%E6%95%B0%E5%92%8C%E9%97%AD%E5%8C%85/">一次性理解立即执行函数和闭包</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Zhou Yuanda | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

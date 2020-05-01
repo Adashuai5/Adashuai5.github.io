@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Zhou Yuanda">
+
+
+    <meta name="subtitle" content="试问谁可，洁白无比？">
+
+
+    <meta name="description" content="当然我也在扯淡。。">
+
+
+    <meta name="keywords" content="前端开发">
+
+
+<title>理解 JSONP 下 | Ada 的个人博客主页</title>
+
+
+
+    <link rel="icon" href="/image/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Ada&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Ada&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">理解 JSONP 下</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Zhou Yuanda</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">August 12, 2018&nbsp;&nbsp;12:25:05</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <p><a href="https://www.jianshu.com/p/2a2fe02917e7" target="_blank" rel="noopener">理解 JSONP 上</a></p>
+<h1 id="跨域-SRJ"><a href="#跨域-SRJ" class="headerlink" title="跨域 SRJ"></a>跨域 SRJ</h1><p><strong>如果我访问其他网站的服务器，可以吗？<br>由于 JSONP 可以规避同源策略，因此可以</strong><br>下面我们自己做两个网站尝试一下<br>请求方：ada.com （浏览器）<br>响应方：jack.com （服务器）</p>
+<p>Linux 或 mac 直接</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi &#x2F;etc&#x2F;hosts</span><br></pre></td></tr></table></figure>
+
+<p>windows 需要找到/etc/hosts 文件 比较难找，推荐 Everything<img src="https://upload-images.jianshu.io/upload_images/7094266-19f9953c967705a5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="">在 hosts 文件下编辑两个网站<img src="https://upload-images.jianshu.io/upload_images/7094266-28b643545d3a06f3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="">打开两个 node 服务器<img src="https://upload-images.jianshu.io/upload_images/7094266-3cd83a6dd9b8e522.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>将 script.src 改成后端服务器的 jack.com</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">script.src &#x3D; &#39;http:&#x2F;&#x2F;jack.com:8002&#x2F;pay&#39;</span><br></pre></td></tr></table></figure>
+
+<p>成功在 ada.com 里接收到 jack.com，ada.com 的前端程序员成功向 jack.com 的后端程序员发起请求并得到响应<img src="https://upload-images.jianshu.io/upload_images/7094266-455e37f97e889991.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="">跨域 SRJ 成功</p>
+<h1 id="代码分离："><a href="#代码分离：" class="headerlink" title="代码分离："></a>代码分离：</h1><p><strong>耦合</strong>和<strong>解耦</strong><img src="https://upload-images.jianshu.io/upload_images/7094266-39446f3e68a37a78.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="">上面的 amount.innerText=amount.innerText-1 就是前端页面的代码，这说明 jack.com 的后端程序元需要对 ada.com 的页面细节了解的很清楚，这种情况叫做耦合<br>那我们让前后端分离呗，即解耦<br>后端改成</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;获取参数.call（this，成功）</span><br><span class="line">response.write(&#96;$&#123;query.callbackName&#125;.call(undefined,&#39;success&#39;)&#96;)</span><br></pre></td></tr></table></figure>
+
+<p>前端给参</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;callbackName &#x3D; 随便</span><br><span class="line">script.src &#x3D; &#39;http:&#x2F;&#x2F;jack.com:8002&#x2F;pay?callbackName&#x3D;yyy&#39;</span><br></pre></td></tr></table></figure>
+
+<h1 id="JSONP"><a href="#JSONP" class="headerlink" title="JSONP:"></a>JSONP:</h1><p><img src="https://upload-images.jianshu.io/upload_images/7094266-9442483142643759.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>上面代码高亮的部分就是<a href="https://www.json.org/" target="_blank" rel="noopener">JSON</a>（一个键必须是双引号的对象）<br>JSON 左边的代码就是左 padding，右边就是右 padding，所以 JSONP=JSON +Padding</p>
+<h1 id="让我们理一下过程"><a href="#让我们理一下过程" class="headerlink" title="让我们理一下过程"></a>让我们理一下过程</h1><p>请求方：ada.com 的前端程序员（浏览器）<br>响应方：jack.com 的后端程序员（服务器） 1.请求方创建 script，src 指向响应方，同时传一个查询参数 ?callbackName=yyy 2.响应方根据查询参数 callbackName，构造形如<br>yyy.call(undefined, ‘你要的数据’)<br>yyy(‘你要的数据’)<br>这样的响应 3.浏览器接收到响应，就会执行 yyy.call(undefined, ‘你要的数据’) 4.那么请求方就知道了他要的数据<br>这就是 JSONP<br><strong>约定：</strong><br>callbackName -&gt; callback<br>yyy -&gt; 随机数 如 ada1213123123412()</p>
+<h1 id="JSONP-方案"><a href="#JSONP-方案" class="headerlink" title="JSONP 方案"></a>JSONP 方案</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">button.addEventListener(&#39;click&#39;, (e)&#x3D;&gt;&#123;</span><br><span class="line">    let script &#x3D; document.createElement(&#39;script&#39;)</span><br><span class="line">    let functionName &#x3D; &#39;ada&#39;+ parseInt(Math.random()*10000000 ,10)</span><br><span class="line">    window[functionName] &#x3D; function()&#123;  &#x2F;&#x2F; 每次请求之前搞出一个随机的函数</span><br><span class="line">        amount.innerText &#x3D; amount.innerText - 1</span><br><span class="line">    &#125;</span><br><span class="line">    script.src &#x3D; &#39;http:&#x2F;&#x2F;jack.com:8002&#x2F;pay?callback&#x3D;&#39; + functionName</span><br><span class="line">    document.body.appendChild(script)</span><br><span class="line">    script.onload &#x3D; function(e)&#123; &#x2F;&#x2F; 状态码是 200~299 则表示成功</span><br><span class="line">        e.currentTarget.remove()</span><br><span class="line">        delete window[functionName] &#x2F;&#x2F; 请求完了就干掉这个随机函数</span><br><span class="line">    &#125;</span><br><span class="line">    script.onload &#x3D; function(e)&#123; &#x2F;&#x2F; 状态码大于等于 400 则表示失败</span><br><span class="line">        e.currentTarget.remove()</span><br><span class="line">        delete window[functionName] &#x2F;&#x2F; 请求完了就干掉这个随机函数</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>Node 部分：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">if (path &#x3D;&#x3D;&#x3D; &#39;&#x2F;pay&#39;) &#123;</span><br><span class="line">    var amount &#x3D; fs.readFileSync(&#39;.&#x2F;db&#39;, &#39;utf8&#39;)</span><br><span class="line">    var newAmount &#x3D; amount - 1</span><br><span class="line">    fs.writeFileSync(&#39;.&#x2F;db&#39;, newAmount)</span><br><span class="line">    response.setHeader(&#39;Content-Type&#39;, &#39;application&#x2F;javascript&#39;)</span><br><span class="line">    response.write(&#96;$&#123;query.callbackName&#125;.call(undefined,</span><br><span class="line">      &#39;success&#39;&#96;)</span><br><span class="line">    response.end()</span><br></pre></td></tr></table></figure>
+
+<p>jQuery 写法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$.ajax(&#123;</span><br><span class="line">url: &quot;http:&#x2F;&#x2F;jack.com:8002&#x2F;pay&quot;,</span><br><span class="line">dataType: &quot;jsonp&quot;,</span><br><span class="line">success: function( response ) &#123;</span><br><span class="line">    if(response &#x3D;&#x3D;&#x3D; &#39;success&#39;)&#123;</span><br><span class="line">    amount.innerText &#x3D; amount.innerText - 1</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<h1 id="JSONP-为什么不支持-POST？"><a href="#JSONP-为什么不支持-POST？" class="headerlink" title="JSONP 为什么不支持 POST？"></a><a href="https://www.zhihu.com/question/28890257" target="_blank" rel="noopener">JSONP 为什么不支持 POST？</a></h1><p>因为 JSONP 是通过<strong>动态创建 Script</strong> 实现的，而<strong>动态创建 Script</strong>只能用 GET 请求，不能用 POST 请求</p>
+<hr>
+<p>本文主要用于个人学习使用</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Zhou Yuanda</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://github.com/Adashuai5/Adashuai5.github.io/2018/08/12/%E7%90%86%E8%A7%A3JSONP-%E4%B8%8B/">https://github.com/Adashuai5/Adashuai5.github.io/2018/08/12/%E7%90%86%E8%A7%A3JSONP-%E4%B8%8B/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/HTTP/"># HTTP</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2018/08/12/%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AAAJAX/">实现一个 AJAX</a>
+            
+            
+            <a class="next" rel="next" href="/2018/08/11/Web-%E6%9C%8D%E5%8A%A1%E5%99%A8/">Web 服务器</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Zhou Yuanda | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Zhou Yuanda">
+
+
+    <meta name="subtitle" content="试问谁可，洁白无比？">
+
+
+    <meta name="description" content="当然我也在扯淡。。">
+
+
+    <meta name="keywords" content="前端开发">
+
+
+<title>CSS 常用布局 续篇 | Ada 的个人博客主页</title>
+
+
+
+    <link rel="icon" href="/image/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Ada&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Ada&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">CSS 常用布局 续篇</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Zhou Yuanda</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">September 10, 2018&nbsp;&nbsp;10:32:52</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <p>几个月前初学 CSS 布局，写了一篇关于 <a href="https://www.jianshu.com/p/59c9477816b8" target="_blank" rel="noopener">CSS 常用布局学习</a> 的博客，介绍了一些传统的依靠 position 和 float 等实现简单的布局方式的例子，这些布局只能简单得实现基本功能，十分不便。<br>今天，作为引申，我们用同样例子，来使用上篇中简单提到的 flex 布局的方案实现。与此同时，我将推荐最近学习的 grid 布局，它十分强大，可以方便得解决各种布局方案，且十分便于理解。</p>
+<h3 id="Flex-实现左中右布局"><a href="#Flex-实现左中右布局" class="headerlink" title="Flex 实现左中右布局"></a>Flex 实现左中右布局</h3><p>主要是在父元素中使用以下代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">display: flex;</span><br><span class="line">flex-direction:row;</span><br></pre></td></tr></table></figure>
+
+<p>相对于传统布局，是不是简便得多<img src="https://upload-images.jianshu.io/upload_images/7094266-f0d2834c90f115a9.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Flex 左中右"></p>
+<h3 id="Flex-实现垂直居中"><a href="#Flex-实现垂直居中" class="headerlink" title="Flex 实现垂直居中"></a>Flex 实现垂直居中</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">display: flex;</span><br><span class="line">justify-content:center;</span><br><span class="line">align-items:center;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://upload-images.jianshu.io/upload_images/7094266-42ece01a2af28519.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Flex 垂直居中"></p>
+<p>可以看到 flex 布局十分方便<br>想要了解更多 flex 布局相关技巧可以阅读阮大大 <a href="http://www.ruanyifeng.com/blog/2015/07/flex-examples.html" target="_blank" rel="noopener">博客</a> 当然你可以看 MDN</p>
+<p>前面介绍的都是一维布局，但是在复杂的二维布局方面，无疑是为解决布局而创建的 CSS 网格布局更为专业<br>学习网格布局事实上是学习对应英文的过程，所以英语好真的很有优势</p>
+<h3 id="Grid-布局实现左中右"><a href="#Grid-布局实现左中右" class="headerlink" title="Grid 布局实现左中右"></a>Grid 布局实现左中右</h3><p>虽然有点大材小用，但是我们是为了和前面的布局方法做对比<br>你只需用两行代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">display: grid;</span><br><span class="line">grid-template-columns: 30% 40% 30%;</span><br></pre></td></tr></table></figure>
+
+<p>grid 布局的代码更省，子元素不需要各自设定，直接在父元素上设定了<img src="https://upload-images.jianshu.io/upload_images/7094266-beb5abb9ff73f97d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Grid 左中右">当然这里的子元素要与对应的格子相配，即 30% 40% 30% 对应的是 div.container 里面的顺序</p>
+<h3 id="网格布局"><a href="#网格布局" class="headerlink" title="网格布局"></a>网格布局</h3><p>这里的 fr 为分数单位</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">display: grid;</span><br><span class="line">grid-template-columns: 1fr 1fr 1fr; &#x2F;&#x2F; 3列均分</span><br><span class="line">grid-template-rows: 1fr 1fr 1fr; &#x2F;&#x2F; 3行均分</span><br></pre></td></tr></table></figure>
+
+<p>通过上面代码实现了一个 3*3 的网格<br>可以通过下面代码选择对应网格，并添加属性</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">grid-column: 1; &#x2F;&#x2F; or 2 or 3</span><br><span class="line">grid-row: 1; &#x2F;&#x2F; or 2 or 3</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://upload-images.jianshu.io/upload_images/7094266-fe08051eb5cf5c1d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="网格布局示例"></p>
+<hr>
+<p>以上只是 flex 布局和 grid 布局的小例子和基本用法<br>想要了解更多 grid 相关内容可以看这篇 <a href="https://www.jianshu.com/p/d183265a8dad" target="_blank" rel="noopener">博客</a><br>通过 flex 和 grid 布局配合使用，基本上可以解决所有 CSS 布局问题</p>
+<p>本文仅供个人学习使用</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Zhou Yuanda</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://github.com/Adashuai5/Adashuai5.github.io/2018/09/10/CSS%E5%B8%B8%E7%94%A8%E5%B8%83%E5%B1%80-%E7%BB%AD%E7%AF%87/">https://github.com/Adashuai5/Adashuai5.github.io/2018/09/10/CSS%E5%B8%B8%E7%94%A8%E5%B8%83%E5%B1%80-%E7%BB%AD%E7%AF%87/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/CSS/"># CSS</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2018/09/16/HTTP-%E5%AD%A6%E4%B9%A0%E4%B9%8B-Cookie/">HTTP 学习之 Cookie</a>
+            
+            
+            <a class="next" rel="next" href="/2018/09/04/AJAX-%E6%98%AF%E4%BB%80%E4%B9%88%E9%AC%BC/">AJAX 是什么鬼</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Zhou Yuanda | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

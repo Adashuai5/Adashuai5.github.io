@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Zhou Yuanda">
+
+
+    <meta name="subtitle" content="试问谁可，洁白无比？">
+
+
+    <meta name="description" content="当然我也在扯淡。。">
+
+
+    <meta name="keywords" content="前端开发">
+
+
+<title>优先级 和 CSS 预处理 | Ada 的个人博客主页</title>
+
+
+
+    <link rel="icon" href="/image/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Ada&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Ada&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">优先级 和 CSS 预处理</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Zhou Yuanda</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">December 20, 2018&nbsp;&nbsp;22:30:16</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h2 id="前言扯淡"><a href="#前言扯淡" class="headerlink" title="前言扯淡"></a>前言扯淡</h2><p>前两天电话面试，被问道了一些 CSS 的基础问题，虽然答上来了，但是不够全面，而且给自己最大的感受是自己对一些概念十分模棱两可，最直观的体现是有时候知道这个概念，却不知道他叫什么。自以为懂，最为致命。<br>需求是最好的学习 API 的方式，面试找工作是最好的学习沉淀的过程。快俩个月没写博客了，终于今天在回顾时有一点点小的感悟，打算记录下来，主要是给自己看。废话不多说，开始正文。</p>
+<h2 id="首先是-优先级"><a href="#首先是-优先级" class="headerlink" title="首先是 优先级"></a>首先是 <a href="https://developer.mozilla.org/zh-CN/docs/Web/CSS/Specificity" target="_blank" rel="noopener">优先级</a></h2><p>链接是文档，优先级主要是指 CSS 属性的优先级。</p>
+<blockquote>
+<p>浏览器通过优先级来判断哪一些属性值与一个元素最为相关，从而在该元素上应用这些属性值。优先级是基于不同种类选择器组成的匹配规则。</p>
+</blockquote>
+<p>简单来说，当你给一个元素声明（或该元素继承而来）多个相同属性时（前提），浏览器选择哪一个作为该元素的应用。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;div&gt;</span><br><span class="line">  &lt;h1 id&#x3D;&quot;title&quot; class&#x3D;&quot;title&quot; style&#x3D;&quot;color: yellow;&quot;&gt;优先级&lt;&#x2F;h1&gt;</span><br><span class="line">&lt;&#x2F;div&gt;</span><br><span class="line">&lt;!--优先级显示为 pink--&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">*&#123;</span><br><span class="line">  color: red;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">h1&#123;</span><br><span class="line">  color: green;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">.title&#123;</span><br><span class="line">  color: blue;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">#title&#123;</span><br><span class="line">  color: black;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">h1&#123;</span><br><span class="line">  color: pink !important;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="优先级如何确定："><a href="#优先级如何确定：" class="headerlink" title="优先级如何确定："></a>优先级如何确定：</h4><p>选择器优先级，下面三种优先级递增：（不细看文档都不知道这些平时在用的选择器的所有名称）</p>
+<ol>
+<li><strong>ID 选择器</strong>（例如, #title）</li>
+<li><strong>类选择器</strong>（class selectors） (例如,.title)，<strong>属性选择器</strong>（attributes selectors）（例如, [type=”radio”]），<strong>伪类</strong>（pseudo-classes）（例如, :hover）</li>
+<li><strong>类型选择器</strong>（type selectors）（例如, h1）和 <strong>伪元素</strong>（pseudo-elements）（例如, ::before）</li>
+</ol>
+<p><strong>通配选择符</strong>（universal selector）(*), <strong>关系选择符</strong>（combinators） (+, &gt;, ~, ‘ ‘) 和 <strong>否定伪类</strong>（negation pseudo-class）(:not()) 对优先级没有影响。（但是，在 :not() 内部声明的选择器是会影响优先级）。<br>给元素添加的<strong>内联样式</strong> (例如, style=”color: yellow;”) 总会覆盖外部样式表的任何样式 ，因此可看作是具有最高的优先级。<br><strong>!important</strong> 是例外，此声明将覆盖任何其他声明，技术上!important 与优先级无关，但它与它直接相关。</p>
+<h4 id="如何利用优先级"><a href="#如何利用优先级" class="headerlink" title="如何利用优先级"></a>如何利用优先级</h4><ol>
+<li>选择器越具体，优先级越高。</li>
+<li>相同优先级情况下，后面的样式覆盖前面的。</li>
+<li>!important 最特殊，有他的声明最优先，但应该避免使用。</li>
+</ol>
+<p>上面内容均来自 MDN，也就是我给的链接，还有很多如<code>无视DOM树中的距离</code>等没有记录。大家还是直接看 MDN 为宜。这些真的是简单的基础内容，但确实有很多细节，如果能够因为无意看到我的文章去看 MDN 文档而收获一些东西，便是此文的意义了。<br>扩展阅读 <a href="https://github.com/jincdream/jincdream.github.io/issues/14">真正理解”CSS 选择器的优先级”</a></p>
+<h2 id="CSS-预处理（预编译）"><a href="#CSS-预处理（预编译）" class="headerlink" title="CSS 预处理（预编译）"></a>CSS 预处理（预编译）</h2><p>当面试关问我知不知道 CSS 预处理的时候，我一时并没有将其与平常再用的 LESS、SCSS 等预编译器对上。也就是我文章开头提到的，有时我们以为熟知的东西，事实上我们那么陌生。</p>
+<hr>
+<p>(以下内容来自 <a href="http://efe.baidu.com/blog/revisiting-css-preprocessors/" target="_blank" rel="noopener">再谈 CSS 预处理器</a>)<br>CSS 预处理器是什么？一般来说，它们基于 CSS 扩展了一套属于自己的 DSL，来解决我们书写 CSS 时难以解决的问题：</p>
+<ul>
+<li>语法不够强大，比如无法嵌套书写导致模块化开发中需要书写很多重复的选择器；</li>
+<li>没有变量和合理的样式复用机制，使得逻辑上相关的属性值必须以字面量的形式重复输出，导致难以维护。</li>
+</ul>
+<p>所以这就决定了 CSS 预处理器的主要目标：提供 CSS 缺失的样式层复用机制、减少冗余代码，提高样式代码的可维护性。</p>
+<hr>
+<p>这篇文章不打算继续将 LESS、SASS 等的嵌套、变量等语法规则。一来这些内容非一篇文章讲得清（我懒），再者看官方文档是最好的入门方式，同时像上面百度 EFE 的文档比我写肯定高到不知道哪里去了。<br>那么我为什么会将 CSS 预处理和 优先级 放在同一篇文章写呢。也是面试官连续问的这俩个问题（真的很基础了，对我这种转行前端新人十分照顾），再者其实两者有一些联系，CSS 预编译也是在变相解决 优先级 的问题，因为我们需要完美利用优先级，所以我们在写 CSS 时往往选择器需要十分详细，如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">div&#123;&#125;</span><br><span class="line">div&gt;ul&#123;&#125;</span><br><span class="line">div&gt;ul&gt;li&#123;&#125;</span><br><span class="line">div&gt;ul&gt;li&gt;a&#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>本着 Dry 宗旨，CSS 预编译的嵌套规则就是为了解决优先级啊。</p>
+<hr>
+<p>本文仅供个人学习使用</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Zhou Yuanda</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://github.com/Adashuai5/Adashuai5.github.io/2018/12/20/%E4%BC%98%E5%85%88%E7%BA%A7-%E5%92%8C-CSS-%E9%A2%84%E5%A4%84%E7%90%86/">https://github.com/Adashuai5/Adashuai5.github.io/2018/12/20/%E4%BC%98%E5%85%88%E7%BA%A7-%E5%92%8C-CSS-%E9%A2%84%E5%A4%84%E7%90%86/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/CSS/"># CSS</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2018/12/29/%E4%BB%8E%E3%80%8C%E4%BB%8E%E8%BE%93%E5%85%A5URL%E5%88%B0%E9%A1%B5%E9%9D%A2%E5%8A%A0%E8%BD%BD%E3%80%8D%E8%B0%88%E5%8F%8AWeb%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/">从「从输入 URL 到页面加载」谈及Web性能优化</a>
+            
+            
+            <a class="next" rel="next" href="/2018/11/02/%E6%B5%85%E8%B0%88JS%E7%BB%A7%E6%89%BF/">浅谈 JS 继承</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Zhou Yuanda | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

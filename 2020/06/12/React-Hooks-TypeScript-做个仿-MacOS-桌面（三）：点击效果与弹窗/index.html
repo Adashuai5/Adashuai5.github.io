@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Zhou Yuanda">
+
+
+    <meta name="subtitle" content="试问谁可，洁白无比？">
+
+
+    <meta name="description" content="当然我也在扯淡。。">
+
+
+    <meta name="keywords" content="前端开发">
+
+
+<title>React Hooks + TypeScript 做个仿 MacOS 桌面（三）：点击效果与弹窗 | Ada 的个人博客主页</title>
+
+
+
+    <link rel="icon" href="/image/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/rss2.xml" title="Ada 的个人博客主页" type="application/rss+xml">
+</head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Ada&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Ada&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">React Hooks + TypeScript 做个仿 MacOS 桌面（三）：点击效果与弹窗</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Zhou Yuanda</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">June 12, 2020&nbsp;&nbsp;22:47:15</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <p>这是我的项目记录系列文章第三篇，目前项目进度有些停滞，主要是最近其他事情比较多加懒，于是我强行让自己在这几天对点击图标跳出弹窗这一过程进行优化，及时总结和记录，同时让大家知道我还活着。</p>
+<p>本篇将介绍目前项目当中，点击 Dock 图标所产生的系列效果，如生成可拖住的弹窗等，目前只有计算器和画板等四个图标可用。</p>
+<p>本文所有代码均在 <a href="https://github.com/Adashuai5/my-desktop">项目代码</a>，项目会一直优化，欢迎 watch 和 star。</p>
+<h3 id="过程分析"><a href="#过程分析" class="headerlink" title="过程分析"></a>过程分析</h3><p>上篇我们已经实现 Dock 的动态效果，接下来我们肯定会不由自主想点图标。当我们点击图标，首先会出现图标弹跳的动效，然后出现图标对应应用弹框，并同时在图标下方出现高亮小圆点。接下来我会用画板 drawing 作为例子展示代码，关于画板的详细内容本篇暂不作介绍，预计会成为第四篇主角。</p>
+<p>本文出现代码内容对应目录：</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/7094266-7efb9c6b79e2ac6f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<h3 id="图标点击交互"><a href="#图标点击交互" class="headerlink" title="图标点击交互"></a>图标点击交互</h3><h4 id="动效实现"><a href="#动效实现" class="headerlink" title="动效实现"></a>动效实现</h4><p>当我们初次点击图标使其变成激活状态时，应该有交互动画：</p>
+<p>这里我参考了 <a href="https://github.com/animate-css/animate.css/blob/master/source/attention_seekers/bounce.css">animate-css 的 bounce.css</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; footer&#x2F;index.scss</span><br><span class="line">@keyframes bounce &#123;</span><br><span class="line">  from,</span><br><span class="line">  20%,</span><br><span class="line">  53%,</span><br><span class="line">  to &#123;</span><br><span class="line">    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);</span><br><span class="line">    transform: translate3d(0, 0, 0);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  40%,</span><br><span class="line">  43% &#123;</span><br><span class="line">    animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06);</span><br><span class="line">    transform: translate3d(0, -35px, 0) scaleY(1.1);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  70% &#123;</span><br><span class="line">    animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06);</span><br><span class="line">    transform: translate3d(0, -35px, 0) scaleY(1.05);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  80% &#123;</span><br><span class="line">    transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);</span><br><span class="line">    transform: translate3d(0, 0, 0) scaleY(0.95);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  90% &#123;</span><br><span class="line">    transform: translate3d(0, -6px, 0) scaleY(1.02);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">.bounce &#123;</span><br><span class="line">  animation-duration: 2s;</span><br><span class="line">  animation-name: top;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="isDrawingOpen（应用开启、关闭）和-isDrawingShow（应用展示、最小化）"><a href="#isDrawingOpen（应用开启、关闭）和-isDrawingShow（应用展示、最小化）" class="headerlink" title="isDrawingOpen（应用开启、关闭）和 isDrawingShow（应用展示、最小化）"></a>isDrawingOpen（应用开启、关闭）和 isDrawingShow（应用展示、最小化）</h4><p>给图标加上点击事件，通过其名字判断是哪个图标。每一个图标我们给到一个布尔值对象，如这里的 isDrawingOpen，它是个对象，里面记录一个布尔值 type，作为弹框开关（只有在打开和关闭应用时使用）；一个 index 记录图标对应顺序。</p>
+<p>点击后给对应图标增加 .bounce，此时图标开始 bounce 动画，同时我们在 2.5s 后改变 type （画板出现）和记录 index，并且将类选择器移除，便于下次重新点击使用。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; Footer.tsx</span><br><span class="line">interface OpenTypes &#123;</span><br><span class="line">  type: boolean;</span><br><span class="line">  index?: number;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const [isDrawingOpen, setDrawingOpen] &#x3D; useState&lt;OpenTypes&gt;(&#123;</span><br><span class="line">  type: false</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">const [isDrawingShow, setDrawingShow] &#x3D; useState(true);</span><br><span class="line"></span><br><span class="line">const dockItemClick &#x3D; useCallback(</span><br><span class="line">  (item: string, index: number) &#x3D;&gt; &#123;</span><br><span class="line">    if (!dockRef.current) &#123;</span><br><span class="line">      return;</span><br><span class="line">    &#125;</span><br><span class="line">    const imgList &#x3D; dockRef.current.childNodes;</span><br><span class="line">    const img &#x3D; imgList[index] as HTMLDivElement;</span><br><span class="line">    switch (item) &#123;</span><br><span class="line">      case &quot;PrefApp.png&quot;:</span><br><span class="line">        if (!isDrawingOpen.type) &#123;</span><br><span class="line">          img.classList.add(&quot;bounce&quot;);</span><br><span class="line">          setTimeout(() &#x3D;&gt; &#123;</span><br><span class="line">            setDrawingOpen(&#123; type: !isDrawingOpen.type, index &#125;);</span><br><span class="line">            img.classList.remove(&quot;bounce&quot;);</span><br><span class="line">          &#125;, 2500);</span><br><span class="line">          return;</span><br><span class="line">        &#125;</span><br><span class="line">        setDrawingShow(!isDrawingShow);</span><br><span class="line">        return;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  [isDrawingOpen, isDrawingShow]</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>与此同时可以看到有一个单独的布尔值：isDrawingShow，它的作用是在应用激活时点击图标或最小化按钮时切换展示状态。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">useEffect(() &#x3D;&gt; &#123;</span><br><span class="line">  if (!dockRef.current) &#123;</span><br><span class="line">    return;</span><br><span class="line">  &#125;</span><br><span class="line">  const imgList &#x3D; dockRef.current.childNodes;</span><br><span class="line">  [isDrawingOpen].forEach((item) &#x3D;&gt; &#123;</span><br><span class="line">    if (item.index) &#123;</span><br><span class="line">      const img &#x3D; imgList[item.index] as HTMLDivElement;</span><br><span class="line">      !item.type</span><br><span class="line">        ? setTimeout(() &#x3D;&gt; &#123;</span><br><span class="line">            img?.classList.remove(&quot;active&quot;);</span><br><span class="line">          &#125;, 1000)</span><br><span class="line">        : img.classList.add(&quot;active&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;, [isDrawingOpen]);</span><br></pre></td></tr></table></figure>
+
+<p>上面就是我们记录 index 的作用，由于关闭应用不受 Dock 控制，我们需要监听 isDrawingOpen 来判断是否加类选择器 active，它的作用主要是图标高亮小圆点的开关</p>
+<h4 id="小圆点的实现"><a href="#小圆点的实现" class="headerlink" title="小圆点的实现"></a>小圆点的实现</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; footer&#x2F;index.scss</span><br><span class="line"></span><br><span class="line">#DockItem &#123;</span><br><span class="line">  position: relative;</span><br><span class="line">  display: flex;</span><br><span class="line">  &amp;.active &#123;</span><br><span class="line">    &amp;::after &#123;</span><br><span class="line">      content: &quot;●&quot;;</span><br><span class="line">      font-size: 0.1em;</span><br><span class="line">      position: absolute;</span><br><span class="line">      bottom: -7px;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="createContext-实现组件通信："><a href="#createContext-实现组件通信：" class="headerlink" title="createContext 实现组件通信："></a>createContext 实现组件通信：</h4><p>这里我们的画板组件肯定是单独成文件的，因此开启和关闭弹窗操作就要用到组件通信。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">export const FooterContext &#x3D; createContext&lt;any&gt;([]);</span><br><span class="line">...</span><br><span class="line">return (</span><br><span class="line">   &lt;React.Fragment&gt;</span><br><span class="line">    &lt;FooterContext.Provider</span><br><span class="line">      value&#x3D;&#123;[isDrawingOpen, setDrawingOpen, isDrawingShow, setDrawingShow]&#125;</span><br><span class="line">      &gt;</span><br><span class="line">      &lt;Drawing &#x2F;&gt;</span><br><span class="line">    &lt;&#x2F;FooterContext.Provider&gt;</span><br><span class="line">    &lt;div ref&#x3D;&#123;dockRef&#125; style&#x3D;&#123;&#123; height: defaultWidth &#125;&#125;&gt;</span><br><span class="line">      &#123;dockList.map((item, index) &#x3D;&gt; &#123;</span><br><span class="line">        return (</span><br><span class="line">          &lt;div</span><br><span class="line">            id&#x3D;&quot;DockItem&quot;</span><br><span class="line">            style&#x3D;&#123;</span><br><span class="line">              &#123;</span><br><span class="line">                backgroundImage: &quot;url(&quot; + require(&quot;.&#x2F;image&#x2F;&quot; + item) + &quot;)&quot;,</span><br><span class="line">                backgroundPosition: &quot;center&quot;,</span><br><span class="line">                backgroundSize: &quot;cover&quot;,</span><br><span class="line">                backgroundRepeat: &quot;no-repeat&quot;,</span><br><span class="line">              &#125; as CSSProperties</span><br><span class="line">            &#125;</span><br><span class="line">            key&#x3D;&#123;index + item&#125;</span><br><span class="line">            onClick&#x3D;&#123;() &#x3D;&gt; dockItemClick(item, index)&#125;</span><br><span class="line">          &#x2F;&gt;</span><br><span class="line">        );</span><br><span class="line">      &#125;)&#125;</span><br><span class="line">    &lt;&#x2F;div&gt;</span><br><span class="line">  &lt;&#x2F;React.Fragment&gt;</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>看过该系列 <a href="https://zhuanlan.zhihu.com/p/145449585" target="_blank" rel="noopener">第二篇</a> 的朋友或许还记得，之前我们的图标均为 img ，而现在改为了 div，其主要目的是为了配合 active 下的伪元素使用（img 使用 ::after 无效）。</p>
+<p>我们通过 createContext 生成一个 FooterContext，像我们的 Drawing 子组件传递 [isDrawingOpen, setDrawingOpen, isDrawingShow, setDrawingShow] ，同时子组件可以调用 FooterContext，改变应用状态。</p>
+<p>下面是子组件 Drawing 使用 FooterContext 的完整代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; drawing&#x2F;index.tsx</span><br><span class="line">import React, &#123; useContext, useEffect, useState, useCallback &#125; from &quot;react&quot;;</span><br><span class="line">import &#123; useModal &#125; from &quot;..&#x2F;modal&#x2F;UseModal&quot;;</span><br><span class="line">import &#123; FooterContext &#125; from &quot;..&#x2F;footer&#x2F;Footer&quot;;</span><br><span class="line">import &#123; TitleBar &#125; from &quot;react-desktop&#x2F;macOs&quot;;</span><br><span class="line">import Canvas from &quot;.&#x2F;Canvas&quot;;</span><br><span class="line">import &quot;.&#x2F;index.scss&quot;;</span><br><span class="line">&#x2F;&#x2F;&#x2F; &lt;reference path&#x3D;&quot;react-desktop.d.ts&quot; &#x2F;&gt;</span><br><span class="line"></span><br><span class="line">export const Drawing &#x3D; React.memo(() &#x3D;&gt; &#123;</span><br><span class="line">  const &#123; open, close, RenderModal &#125; &#x3D; useModal();</span><br><span class="line">  const [</span><br><span class="line">    isDrawingOpen,</span><br><span class="line">    setDrawingOpen,</span><br><span class="line">    isDrawingShow,</span><br><span class="line">    setDrawingShow,</span><br><span class="line">  ] &#x3D; useContext(FooterContext);</span><br><span class="line">  const [style, setStyle] &#x3D; useState(&#123; width: 1200, height: 800 &#125;);</span><br><span class="line">  const [isFullscreen, setFullscreen] &#x3D; useState(false);</span><br><span class="line"></span><br><span class="line">  useEffect(isDrawingOpen.type ? open : close, [isDrawingOpen]);</span><br><span class="line">  const maximizeClick &#x3D; useCallback(() &#x3D;&gt; &#123;</span><br><span class="line">    if (isFullscreen) &#123;</span><br><span class="line">      setStyle(&#123; width: 1200, height: 800 &#125;);</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">      setStyle(&#123; width: -1, height: -1 &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">    setFullscreen(!isFullscreen);</span><br><span class="line">  &#125;, [isFullscreen]);</span><br><span class="line"></span><br><span class="line">  return (</span><br><span class="line">    &lt;RenderModal</span><br><span class="line">      data&#x3D;&#123;&#123;</span><br><span class="line">        width: style.width,</span><br><span class="line">        height: style.height,</span><br><span class="line">        id: &quot;DrawingView&quot;,</span><br><span class="line">        moveId: &quot;DrawingMove&quot;,</span><br><span class="line">        isShow: isDrawingShow,</span><br><span class="line">      &#125;&#125;</span><br><span class="line">    &gt;</span><br><span class="line">      &lt;div className&#x3D;&quot;drawing-wrapper&quot;&gt;</span><br><span class="line">        &lt;TitleBar</span><br><span class="line">          controls</span><br><span class="line">          id&#x3D;&quot;DrawingMove&quot;</span><br><span class="line">          isFullscreen&#x3D;&#123;isFullscreen&#125;</span><br><span class="line">          onCloseClick&#x3D;&#123;() &#x3D;&gt; &#123;</span><br><span class="line">            close();</span><br><span class="line">            setDrawingOpen(&#123; ...isDrawingOpen, type: false &#125;);</span><br><span class="line">          &#125;&#125;</span><br><span class="line">          onMinimizeClick&#x3D;&#123;() &#x3D;&gt; &#123;</span><br><span class="line">            setDrawingShow(false);</span><br><span class="line">          &#125;&#125;</span><br><span class="line">          onMaximizeClick&#x3D;&#123;maximizeClick&#125;</span><br><span class="line">          onResizeClick&#x3D;&#123;maximizeClick&#125;</span><br><span class="line">        &gt;&lt;&#x2F;TitleBar&gt;</span><br><span class="line">        &lt;Canvas</span><br><span class="line">          height&#x3D;&#123;isFullscreen ? document.body.clientHeight - 32 : style.height&#125;</span><br><span class="line">          width&#x3D;&#123;isFullscreen ? document.body.clientWidth : style.width&#125;</span><br><span class="line">        &#x2F;&gt;</span><br><span class="line">      &lt;&#x2F;div&gt;</span><br><span class="line">    &lt;&#x2F;RenderModal&gt;</span><br><span class="line">  );</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>这里的 useModal 是一个弹框组件，下文详解。Canvas 是 drawing 的主体，这里我们不过多介绍。</p>
+<h4 id="react-desktop-macOs-的使用及自定义声明文件"><a href="#react-desktop-macOs-的使用及自定义声明文件" class="headerlink" title="react-desktop/macOs 的使用及自定义声明文件"></a>react-desktop/macOs 的使用及自定义声明文件</h4><p>可以看到我使用了 <a href="https://reactdesktop.js.org/docs/mac-os/title-bar" target="_blank" rel="noopener">react-desktop/macOs</a> 组件，一个 react 的桌面 UI ，但是这个库没有 @types ，需要自己写 .d.ts:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; tsconfig.json</span><br><span class="line">&#123;</span><br><span class="line">  &quot;compilerOptions&quot;: &#123;</span><br><span class="line">    &quot;baseUrl&quot;: &quot;.&#x2F;&quot;,</span><br><span class="line">    &quot;target&quot;: &quot;es5&quot;,</span><br><span class="line">    &quot;lib&quot;: [&quot;dom&quot;, &quot;dom.iterable&quot;, &quot;esnext&quot;],</span><br><span class="line">    &quot;allowJs&quot;: true,</span><br><span class="line">    &quot;skipLibCheck&quot;: true,</span><br><span class="line">    &quot;esModuleInterop&quot;: true,</span><br><span class="line">    &quot;allowSyntheticDefaultImports&quot;: true,</span><br><span class="line">    &quot;strict&quot;: true,</span><br><span class="line">    &quot;forceConsistentCasingInFileNames&quot;: true,</span><br><span class="line">    &quot;module&quot;: &quot;esnext&quot;,</span><br><span class="line">    &quot;moduleResolution&quot;: &quot;node&quot;,</span><br><span class="line">    &quot;resolveJsonModule&quot;: true,</span><br><span class="line">    &quot;isolatedModules&quot;: true,</span><br><span class="line">    &quot;noEmit&quot;: true,</span><br><span class="line">    &quot;jsx&quot;: &quot;react&quot;</span><br><span class="line">  &#125;,</span><br><span class="line">  &quot;include&quot;: [&quot;src&quot;, &quot;typings&quot;] &#x2F;&#x2F; 主要是这里加了 typings</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; typings&#x2F;react-desktop.d.ts</span><br><span class="line">declare module &quot;react-desktop&#x2F;macOs&quot; &#123;</span><br><span class="line">  export const View: JSX;</span><br><span class="line">  export const Radio: JSX;</span><br><span class="line">  export const TitleBar: JSX;</span><br><span class="line">  export const Toolbar: JSX;</span><br><span class="line">  export const Text: JSX;</span><br><span class="line">  export const Box: JSX;</span><br><span class="line">  export const ListView: JSX;</span><br><span class="line">  export const ListViewRow: JSX;</span><br><span class="line">  export const Window: JSX;</span><br><span class="line">  export const Dialog: JSX;</span><br><span class="line">  export const Button: JSX;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后通过下面方式引入，就可以在 TypeScript 内使用了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;&#x2F; &lt;reference path&#x3D;&quot;react-desktop.d.ts&quot; &#x2F;&gt;</span><br></pre></td></tr></table></figure>
+
+<h4 id="TitleBar"><a href="#TitleBar" class="headerlink" title="TitleBar"></a>TitleBar</h4><p>我们继续看我们的 drawing/index.tsx，这里主要用到了 TitleBar</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/7094266-743fed1cf7f3cde0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>可以看到 useModal 里释出了 open, close, RenderModal，其中 RenderModal 就是一会讲到的 弹窗，前两个就是控制弹窗的开关。</p>
+<p>我们点击红色的关闭时，会调用父组件传过来的 isDrawingOpen, setDrawingOpen；而黄色的最小化按钮则调用 setDrawingShow(false)，这里我们直接设置为 false 因为再次展示是通过点击图标，最小化时高亮点不应该去除；maximizeClick 函数用于绿色最大化按钮，其中我用 width 和 height 是 -1 告诉 Modal 全屏，弹窗及其拖拽需要包括他俩再内的 data 所传递过去的值。</p>
+<h3 id="用-Portal-实现弹窗组件"><a href="#用-Portal-实现弹窗组件" class="headerlink" title="用 Portal 实现弹窗组件"></a>用 Portal 实现弹窗组件</h3><p>项目的每个小应用本质上是个弹窗，因此实现一个可复用的组件十分必要，得益于 Portal ，我们能快速实现。<br>我直接复用了 <a href="https://juejin.im/post/5e774a1ae51d4527271ebc92#heading-7" target="_blank" rel="noopener">这篇文章</a> 里的 React Hooks 版本 Portal 实现方式。</p>
+<h4 id="可拖拽弹窗："><a href="#可拖拽弹窗：" class="headerlink" title="可拖拽弹窗："></a>可拖拽弹窗：</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 代码篇幅较长，可以先看上面参考博客内版本</span><br><span class="line">&#x2F;&#x2F; Modal.tsx</span><br><span class="line">import ReactDOM from &quot;react-dom&quot;;</span><br><span class="line">import React, &#123;</span><br><span class="line">  useState,</span><br><span class="line">  useCallback,</span><br><span class="line">  useMemo,</span><br><span class="line">  useEffect,</span><br><span class="line">  CSSProperties,</span><br><span class="line">&#125; from &quot;react&quot;;</span><br><span class="line"></span><br><span class="line">type Props &#x3D; &#123;</span><br><span class="line">  children: React.ReactChild;</span><br><span class="line">  closeModal: () &#x3D;&gt; void;</span><br><span class="line">  onDrag: (T: any) &#x3D;&gt; void;</span><br><span class="line">  onDragEnd: () &#x3D;&gt; void;</span><br><span class="line">  data: &#123;</span><br><span class="line">    width: number;</span><br><span class="line">    height: number;</span><br><span class="line">    id: string;</span><br><span class="line">    moveId: string;</span><br><span class="line">    isShow: boolean;</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">const Modal &#x3D; React.memo(</span><br><span class="line">  (&#123; children, closeModal, onDrag, onDragEnd, data &#125;: Props) &#x3D;&gt; &#123;</span><br><span class="line">    const domEl &#x3D; document.getElementById(&quot;main-view&quot;) as HTMLDivElement;</span><br><span class="line">    if (!domEl) return null;</span><br><span class="line">    const dragEl &#x3D; document.getElementById(data.id) as HTMLDivElement;</span><br><span class="line">    const moveEl &#x3D; document.getElementById(data.moveId) as HTMLDivElement;</span><br><span class="line">    const localPosition &#x3D; localStorage.getItem(data.id) || null;</span><br><span class="line">    const initPosition &#x3D; localPosition</span><br><span class="line">      ? JSON.parse(localPosition)</span><br><span class="line">      : &#123;</span><br><span class="line">          x: data.width &#x3D;&#x3D;&#x3D; -1 ? 0 : (window.innerWidth - data.width) &#x2F; 2,</span><br><span class="line">          y: data.height &#x3D;&#x3D;&#x3D; -1 ? 0 : (window.innerHeight - data.height) &#x2F; 2,</span><br><span class="line">        &#125;;</span><br><span class="line">    const [state, setState] &#x3D; useState(&#123;</span><br><span class="line">      isDragging: false,</span><br><span class="line">      origin: &#123; x: 0, y: 0 &#125;,</span><br><span class="line">      position: initPosition,</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    const handleMouseDown &#x3D; useCallback((&#123; clientX, clientY &#125;) &#x3D;&gt; &#123;</span><br><span class="line">      setState((state) &#x3D;&gt; (&#123;</span><br><span class="line">        ...state,</span><br><span class="line">        isDragging: true,</span><br><span class="line">        origin: &#123;</span><br><span class="line">          x: clientX - state.position.x,</span><br><span class="line">          y: clientY - state.position.y,</span><br><span class="line">        &#125;,</span><br><span class="line">      &#125;));</span><br><span class="line">    &#125;, []);</span><br><span class="line"></span><br><span class="line">    const handleMouseMove &#x3D; useCallback(</span><br><span class="line">      (&#123; clientX, clientY, target &#125;) &#x3D;&gt; &#123;</span><br><span class="line">        if (!state.isDragging || (moveEl &amp;&amp; target !&#x3D;&#x3D; moveEl)) return;</span><br><span class="line">        let x &#x3D; clientX - state.origin.x;</span><br><span class="line">        let y &#x3D; clientY - state.origin.y;</span><br><span class="line">        if (x &lt;&#x3D; 0) &#123;</span><br><span class="line">          x &#x3D; 0;</span><br><span class="line">        &#125; else if (x &gt; window.innerWidth - dragEl.offsetWidth) &#123;</span><br><span class="line">          x &#x3D; window.innerWidth - dragEl.offsetWidth;</span><br><span class="line">        &#125;</span><br><span class="line">        if (y &lt;&#x3D; 0) &#123;</span><br><span class="line">          y &#x3D; 0;</span><br><span class="line">        &#125; else if (y &gt; window.innerHeight - dragEl.offsetHeight) &#123;</span><br><span class="line">          y &#x3D; window.innerHeight - dragEl.offsetHeight;</span><br><span class="line">        &#125;</span><br><span class="line">        const newPosition &#x3D; &#123; x, y &#125;;</span><br><span class="line">        setState((state) &#x3D;&gt; (&#123;</span><br><span class="line">          ...state,</span><br><span class="line">          position: newPosition,</span><br><span class="line">        &#125;));</span><br><span class="line">        onDrag(&#123; newPosition, domEl &#125;);</span><br><span class="line">      &#125;,</span><br><span class="line">      [state.isDragging, state.origin, moveEl, dragEl, onDrag, domEl]</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    const handleMouseUp &#x3D; useCallback(() &#x3D;&gt; &#123;</span><br><span class="line">      if (state.isDragging) &#123;</span><br><span class="line">        setState((state) &#x3D;&gt; (&#123;</span><br><span class="line">          ...state,</span><br><span class="line">          isDragging: false,</span><br><span class="line">        &#125;));</span><br><span class="line"></span><br><span class="line">        onDragEnd();</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;, [state.isDragging, onDragEnd]);</span><br><span class="line"></span><br><span class="line">    useEffect(() &#x3D;&gt; &#123;</span><br><span class="line">      if (data.width &#x3D;&#x3D;&#x3D; -1) &#123;</span><br><span class="line">        setState(&#123;</span><br><span class="line">          isDragging: false,</span><br><span class="line">          origin: &#123; x: 0, y: 0 &#125;,</span><br><span class="line">          position: &#123; x: 0, y: 0 &#125;,</span><br><span class="line">        &#125;);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;, [data.width]);</span><br><span class="line"></span><br><span class="line">    useEffect(() &#x3D;&gt; &#123;</span><br><span class="line">      if (!domEl) return;</span><br><span class="line">      domEl.addEventListener(&quot;mousemove&quot;, handleMouseMove);</span><br><span class="line">      domEl.addEventListener(&quot;mouseup&quot;, handleMouseUp);</span><br><span class="line">      return () &#x3D;&gt; &#123;</span><br><span class="line">        domEl.removeEventListener(&quot;mousemove&quot;, handleMouseMove);</span><br><span class="line">        domEl.removeEventListener(&quot;mouseup&quot;, handleMouseUp);</span><br><span class="line">        if (data.width !&#x3D;&#x3D; -1) &#123;</span><br><span class="line">          localStorage.setItem(data.id, JSON.stringify(state.position));</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;;</span><br><span class="line">    &#125;, [</span><br><span class="line">      domEl,</span><br><span class="line">      handleMouseMove,</span><br><span class="line">      handleMouseUp,</span><br><span class="line">      data.id,</span><br><span class="line">      data.width,</span><br><span class="line">      state.position,</span><br><span class="line">    ]);</span><br><span class="line"></span><br><span class="line">    const styles &#x3D; useMemo(</span><br><span class="line">      () &#x3D;&gt; (&#123;</span><br><span class="line">        left: &#96;$&#123;state.position.x&#125;px&#96;,</span><br><span class="line">        top: &#96;$&#123;state.position.y&#125;px&#96;,</span><br><span class="line">        zIndex: state.isDragging ? 2 : 1,</span><br><span class="line">        display: data.isShow ? &quot;block&quot; : &quot;none&quot;,</span><br><span class="line">        position: &quot;absolute&quot;,</span><br><span class="line">      &#125;),</span><br><span class="line">      [state.isDragging, state.position, data.isShow]</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    return ReactDOM.createPortal(</span><br><span class="line">      &lt;div</span><br><span class="line">        style&#x3D;&#123;styles as CSSProperties&#125;</span><br><span class="line">        onMouseDown&#x3D;&#123;handleMouseDown&#125;</span><br><span class="line">        id&#x3D;&#123;data.id&#125;</span><br><span class="line">      &gt;</span><br><span class="line">        &#123;children&#125;</span><br><span class="line">      &lt;&#x2F;div&gt;,</span><br><span class="line">      domEl</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>可以看到我在 Modal.tsx 中加入了拖拽的功能，代码篇幅很长，但原理其实比较简单，可以先看参考博客中的纯 Modal 版本后在看加入拖拽代码的版本。</p>
+<p>这里我直接展示了完整代码，原本打算像第二篇讲动效那样介绍，但事实上两者思路十分相似，都是通过 useEffect 监听鼠标事件，那么我简单介绍下思路，便于理解：</p>
+<p>首先我们看到有三个 dom 元素 domEl、dragEl 、moveEl：domEl 和参考文章中一样，主要是弹窗出现的 dom，我将它加在了 APP.tsx 内；dragEl 就代表了 应用主体 dom（这里就是 Drawing）；moveEl 则是应用组件内部可拖拽部分，一般是 TitleBar。</p>
+<p>由于模拟应用，我们需要记录应用当前位置，所以用到了 localStorage，initPosition 初始化应用位置，通过 -1 判断是否全屏。</p>
+<p>state 用于记录鼠标数据及是否可拖拽；handleMouseDown 记录下当前鼠标坐标，并开启拖拽；handleMouseMove 计算出移动位移，赋值给 position，需要注意边界情况，当然这里我简化了操作，直接不允许出屏了；handleMouseUp 关闭拖拽；closeModal, onDrag, onDragEnd 分别是弹窗内部关闭函数，可附加的拖拽事件和停止事件。<br>以上就是弹框组件及拖拽的主要思路了。</p>
+<h4 id="UseModal"><a href="#UseModal" class="headerlink" title="UseModal"></a>UseModal</h4><p>UseModal 基本和文中一致：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; UseModal.tsx</span><br><span class="line">import React, &#123; useState &#125; from &quot;react&quot;;</span><br><span class="line"></span><br><span class="line">import Modal from &quot;.&#x2F;Modal&quot;;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; Modal组件最基础的两个事件，open&#x2F;close</span><br><span class="line">export const useModal &#x3D; () &#x3D;&gt; &#123;</span><br><span class="line">  const [isVisible, setIsVisible] &#x3D; useState(false);</span><br><span class="line"></span><br><span class="line">  const open &#x3D; () &#x3D;&gt; setIsVisible(true);</span><br><span class="line">  const close &#x3D; () &#x3D;&gt; setIsVisible(false);</span><br><span class="line"></span><br><span class="line">  const RenderModal &#x3D; (&#123;</span><br><span class="line">    children,</span><br><span class="line">    data,</span><br><span class="line">  &#125;: &#123;</span><br><span class="line">    children: React.ReactChild;</span><br><span class="line">    data: &#123;</span><br><span class="line">      width: number;</span><br><span class="line">      height: number;</span><br><span class="line">      id: string;</span><br><span class="line">      moveId: string;</span><br><span class="line">      isShow: boolean;</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;) &#x3D;&gt; (</span><br><span class="line">    &lt;React.Fragment&gt;</span><br><span class="line">      &#123;isVisible &amp;&amp; (</span><br><span class="line">        &lt;Modal</span><br><span class="line">          data&#x3D;&#123;data&#125;</span><br><span class="line">          closeModal&#x3D;&#123;close&#125;</span><br><span class="line">          onDrag&#x3D;&#123;() &#x3D;&gt; console.log(&quot;onDrag&quot;)&#125;</span><br><span class="line">          onDragEnd&#x3D;&#123;() &#x3D;&gt; console.log(&quot;onDragEnd&quot;)&#125;</span><br><span class="line">        &gt;</span><br><span class="line">          &#123;children&#125;</span><br><span class="line">        &lt;&#x2F;Modal&gt;</span><br><span class="line">      )&#125;</span><br><span class="line">    &lt;&#x2F;React.Fragment&gt;</span><br><span class="line">  );</span><br><span class="line"></span><br><span class="line">  return &#123;</span><br><span class="line">    open,</span><br><span class="line">    close,</span><br><span class="line">    RenderModal,</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>如何使用该组件我们上文已讲到，如果你忘了可以回看。</p>
+<p>至此，我们已经完成了开篇的过程分析了。</p>
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>本篇文章介绍了项目从点击 Dock 呈现应用到关闭应用的过程实现，里面有较多细节，值得反复回味与优化。</p>
+<p>此篇相对前两篇较长，能看到这里都是真爱（学习和我）。既然如此，不如给我点个赞吧 🍮。</p>
+<p>目前该项目已完成部分功能，包括简单设置，基础计算器，基础画板等，即使是这些已有功能也有很多需要完善的地方。</p>
+<p>后续我会慢慢优化，并在相应模块代码优化到一定程度时不定时更新系列文章。</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Zhou Yuanda</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://github.com/Adashuai5/Adashuai5.github.io/2020/06/12/React-Hooks-TypeScript-%E5%81%9A%E4%B8%AA%E4%BB%BF-MacOS-%E6%A1%8C%E9%9D%A2%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9A%E7%82%B9%E5%87%BB%E6%95%88%E6%9E%9C%E4%B8%8E%E5%BC%B9%E7%AA%97/">https://github.com/Adashuai5/Adashuai5.github.io/2020/06/12/React-Hooks-TypeScript-%E5%81%9A%E4%B8%AA%E4%BB%BF-MacOS-%E6%A1%8C%E9%9D%A2%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9A%E7%82%B9%E5%87%BB%E6%95%88%E6%9E%9C%E4%B8%8E%E5%BC%B9%E7%AA%97/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E4%BB%BF-MacOS-%E6%A1%8C%E9%9D%A2%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95/"># 仿 MacOS 桌面项目记录</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2020/06/18/React-Hooks-TypeScript-%E5%81%9A%E4%B8%AA%E4%BB%BF-MacOS-%E6%A1%8C%E9%9D%A2%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9ACanvas-%E5%AE%9E%E7%8E%B0%E7%94%BB%E5%9B%BE%E5%B7%A5%E5%85%B7/">React Hooks + TypeScript 做个仿 MacOS 桌面（四）：Canvas 实现画图工具</a>
+            
+            
+            <a class="next" rel="next" href="/2020/06/05/React-Hooks-TypeScript-%E5%81%9A%E4%B8%AA%E4%BB%BF-MacOS-%E6%A1%8C%E9%9D%A2%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9A%E5%AE%9E%E7%8E%B0-Dock-%E5%8A%A8%E6%95%88/">React Hooks + TypeScript 做个仿 MacOS 桌面（二）：实现 Dock 动效</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Zhou Yuanda | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

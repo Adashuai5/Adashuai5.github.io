@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Zhou Yuanda">
+
+
+    <meta name="subtitle" content="试问谁可，洁白无比？">
+
+
+    <meta name="description" content="当然我也在扯淡。。">
+
+
+    <meta name="keywords" content="前端开发">
+
+
+<title>React Hooks + TypeScript 做个仿 MacOS 桌面（二）：实现 Dock 动效 | Ada 的个人博客主页</title>
+
+
+
+    <link rel="icon" href="/image/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/rss2.xml" title="Ada 的个人博客主页" type="application/rss+xml">
+</head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Ada&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Ada&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">React Hooks + TypeScript 做个仿 MacOS 桌面（二）：实现 Dock 动效</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Zhou Yuanda</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">June 5, 2020&nbsp;&nbsp;22:46:06</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <p>这是我的项目记录系列文章第二篇，在上一篇我简单介绍了项目的初衷和流程等。现在这个项目已经做了一段时间，对 Hooks 和 TypeScript 也有了一定认识，相信优化和记录能有更多理解，同时可能收获大家的指导。</p>
+<p>本篇文章我将梳理 Mac 的 Dock 动效的实现过程，你可以在我的项目 <a href="https://github.com/Adashuai5/my-desktop">代码（欢迎 watch 和 star）</a>体验，同时本文完整代码均在 <a href="https://codesandbox.io/s/jovial-johnson-2rjnl?file=/src/Docker.tsx" target="_blank" rel="noopener">sandbox</a> 供你把玩。</p>
+<h3 id="基础结构搭建"><a href="#基础结构搭建" class="headerlink" title="基础结构搭建"></a>基础结构搭建</h3><p>我们会在 app 文件下创建 footer，在其内部引入我们的 Docker 组件，我们找到几张图标 png ，以图标名组成 dockList 通过 require 引入在 Docker 内部，它们就是本次主角，同时通过使用 useRef 钩子给它们的父亲 div 绑定一个 ref，便于后续操作。</p>
+<p>我们给每个图标一个默认宽度 defaultWidth，由此可得到背景 div 的宽度和高度。</p>
+<p>这里背景 div 的宽度通过内部元素撑开，因此我们不必单独计算设定，原来我就又计算并设置了一遍宽度，多此一举，影响性能和体验。</p>
+<p>但是高度需要设置一下，因为图标的高度会变化，我们需要保持背景高度不变。当然这里可以直接设置，setDockStyle 用不到，如 sandbox 里一样，但如需更改 Docker 位置，就需要用到 setDockStyle，在变换到左右侧时 height 更改为 width。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">import React, &#123; useState, useRef &#125; from &quot;react&quot;;</span><br><span class="line"></span><br><span class="line">export const Docker &#x3D; () &#x3D;&gt; &#123;</span><br><span class="line">  const [defaultWidth] &#x3D; useState(76);</span><br><span class="line">  const [dockList] &#x3D; useState&lt;string[]&gt;([</span><br><span class="line">    &quot;Finder.png&quot;,</span><br><span class="line">    &quot;Launchpad.png&quot;,</span><br><span class="line">    &quot;PrefApp.png&quot;,</span><br><span class="line">    &quot;Chrome.png&quot;,</span><br><span class="line">    &quot;Terminal.png&quot;,</span><br><span class="line">    &quot;Calculator.png&quot;,</span><br><span class="line">    &quot;Drawing.png&quot;</span><br><span class="line">  ]);</span><br><span class="line">  const [dockStyle, setDockStyle] &#x3D; useState(&#123; height: defaultWidth &#125;);</span><br><span class="line">  const dockRef &#x3D; useRef&lt;HTMLDivElement&gt;(null);</span><br><span class="line"></span><br><span class="line">  return (</span><br><span class="line">    &lt;div ref&#x3D;&#123;dockRef&#125; style&#x3D;&#123;dockStyle&#125;&gt;</span><br><span class="line">      &#123;dockList.map((item, index) &#x3D;&gt; &#123;</span><br><span class="line">        return (</span><br><span class="line">          &lt;img src&#x3D;&#123;require(&quot;.&#x2F;image&#x2F;&quot; + item)&#125; alt&#x3D;&#123;item&#125; key&#x3D;&#123;index + item&#125; &#x2F;&gt;</span><br><span class="line">        );</span><br><span class="line">      &#125;)&#125;</span><br><span class="line">    &lt;&#x2F;div&gt;</span><br><span class="line">  );</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="初始化样式"><a href="#初始化样式" class="headerlink" title="初始化样式"></a>初始化样式</h3><p>这里主要是设定每个图片的默认宽度和背景 div 的宽度和高度</p>
+<p>同时这里用了 mouseleave，事实上也是鼠标离开 Dock 事件所需函数（看下面就懂了）。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">const mouseleave &#x3D; useCallback(() &#x3D;&gt; &#123;</span><br><span class="line">  if (!dockRef.current) &#123;</span><br><span class="line">    return;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  const imgList &#x3D; dockRef.current.childNodes;</span><br><span class="line">  for (let i &#x3D; 0; i &lt; imgList.length; i++) &#123;</span><br><span class="line">    const img &#x3D; imgList[i] as HTMLImageElement;</span><br><span class="line">    img.width &#x3D; defaultWidth;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;, [defaultWidth, dockList]);</span><br><span class="line"></span><br><span class="line">useEffect(() &#x3D;&gt; &#123;</span><br><span class="line">  mouseleave();</span><br><span class="line">&#125;, [mouseleave]);</span><br></pre></td></tr></table></figure>
+
+<p>css 如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">.App &#123;</span><br><span class="line">  footer&#123;</span><br><span class="line">    position: fixed;</span><br><span class="line">    bottom: 0;</span><br><span class="line">    width: 100vw;</span><br><span class="line">    display: flex;</span><br><span class="line">    justify-content: center;</span><br><span class="line">    div&#123;</span><br><span class="line">      display: flex;</span><br><span class="line">      align-items: flex-end;</span><br><span class="line">      background-color: rgba(222, 223, 227, 0.7);</span><br><span class="line">      box-shadow: rgba(0, 0, 0, 0.31) 0px 0px 1px, rgba(0, 0, 0, 0.18) 0px 0px 5px,</span><br><span class="line">        rgba(0, 0, 0, 0.3) 0px 8px 50px;</span><br><span class="line">      border-top-left-radius: 0.4rem;</span><br><span class="line">      border-top-right-radius: 0.4rem;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>默认效果已经有了</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/7094266-48beb72925a7cbf1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<h3 id="事件逻辑"><a href="#事件逻辑" class="headerlink" title="事件逻辑"></a>事件逻辑</h3><p>我们需要通过监听 Docker div 的鼠标进入和离开事件，一般我们使用 useCallback 缓存事件，同时使用 useEffect 作事件变化监听处理。mouseleave 我们已经在上面展示，不作展开。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">const mousemove &#x3D; useCallback(e &#x3D;&gt; &#123;</span><br><span class="line">  console.log(e);</span><br><span class="line">&#125;, []);</span><br><span class="line">const mouseleave &#x3D; useCallback(e &#x3D;&gt; &#123;</span><br><span class="line">  console.log(e);</span><br><span class="line">&#125;, []);</span><br><span class="line"></span><br><span class="line">useEffect(() &#x3D;&gt; &#123;</span><br><span class="line">  if (!dockRef.current) &#123;</span><br><span class="line">    return;</span><br><span class="line">  &#125;</span><br><span class="line">  const dockBackground: HTMLDivElement &#x3D; dockRef.current;</span><br><span class="line">  dockBackground.addEventListener(&quot;mousemove&quot;, mousemove);</span><br><span class="line">  dockBackground.addEventListener(&quot;mouseleave&quot;, mouseleave);</span><br><span class="line">  return () &#x3D;&gt; &#123;</span><br><span class="line">    dockBackground.removeEventListener(&quot;mousemove&quot;, mousemove);</span><br><span class="line">    dockBackground.removeEventListener(&quot;mouseleave&quot;, mouseleave);</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;, [mousemove, mouseleave]);</span><br></pre></td></tr></table></figure>
+
+<p>Docker 动效思路</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/7094266-9f3abba016d89cfb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>如图箭头，我们根据鼠标事件位置与各图标中心点距离来调整图标大小，通过该差值与设定宽度（这里我使用 Docker 的初始宽度）比值作为图标放大参考，这里我使用的放大倍数为 2，直接看代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">const getOffset &#x3D; useCallback(</span><br><span class="line">  (el: HTMLElement, offset: &quot;top&quot; | &quot;left&quot;): number &#x3D;&gt; &#123;</span><br><span class="line">    const elOffset &#x3D; offset &#x3D;&#x3D;&#x3D; &quot;top&quot; ? el.offsetTop : el.offsetLeft;</span><br><span class="line">    if (el.offsetParent &#x3D;&#x3D; null) &#123;</span><br><span class="line">      return elOffset;</span><br><span class="line">    &#125;</span><br><span class="line">    return elOffset + getOffset(el.offsetParent as HTMLElement, offset);</span><br><span class="line">  &#125;,</span><br><span class="line">  []</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line">const mousemove &#x3D; useCallback(</span><br><span class="line">  (&#123; clientX, clientY &#125;) &#x3D;&gt; &#123;</span><br><span class="line">    if (!dockRef.current) &#123;</span><br><span class="line">      return;</span><br><span class="line">    &#125;</span><br><span class="line">    const imgList &#x3D; dockRef.current.childNodes;</span><br><span class="line">    for (let i &#x3D; 0; i &lt; imgList.length; i++) &#123;</span><br><span class="line">      const img &#x3D; imgList[i] as HTMLImageElement;</span><br><span class="line">      const x &#x3D; img.offsetLeft + defaultWidth &#x2F; 2 - clientX;</span><br><span class="line">      const y &#x3D;</span><br><span class="line">        img.offsetTop +</span><br><span class="line">        getOffset(dockRef.current, &quot;top&quot;) +</span><br><span class="line">        img.offsetHeight &#x2F; 2 -</span><br><span class="line">        clientY;</span><br><span class="line">      let imgScale &#x3D;</span><br><span class="line">        1 - Math.sqrt(x * x + y * y) &#x2F; (imgList.length * defaultWidth);</span><br><span class="line">      if (imgScale &lt; 0.5) &#123;</span><br><span class="line">        imgScale &#x3D; 0.5;</span><br><span class="line">      &#125;</span><br><span class="line">      img.width &#x3D; defaultWidth * 2 * imgScale;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  [defaultWidth, getOffset]</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>至此，Docker 动效就完成了。我们还可以通过修改 defaultWidth 来调整图标大小，当然还有动效放大倍数 imgScale，甚至 Docker 位置，做到与 Mac 桌面一样，这也正式我的项目在做的东西。</p>
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>在写这篇文章的同时，也对代码和过程有了梳理，目前该项目已完成部分功能，包括简单设置，基础计算器，基础画板等，即使是这些已有功能也有很多需要完善的地方。</p>
+<p>后续我会慢慢优化，并在相应模块代码优化到一定程度时不定时更新系列文章。</p>
+<p>如果你喜欢这篇文章，不要忘了给我点赞。🍮</p>
+<p><strong>本文参考</strong>：<br><a href="https://www.cnblogs.com/milly/p/dock-effect.html" target="_blank" rel="noopener">Mac Dock 效果及原理（勾股定理）</a></p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Zhou Yuanda</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://github.com/Adashuai5/Adashuai5.github.io/2020/06/05/React-Hooks-TypeScript-%E5%81%9A%E4%B8%AA%E4%BB%BF-MacOS-%E6%A1%8C%E9%9D%A2%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9A%E5%AE%9E%E7%8E%B0-Dock-%E5%8A%A8%E6%95%88/">https://github.com/Adashuai5/Adashuai5.github.io/2020/06/05/React-Hooks-TypeScript-%E5%81%9A%E4%B8%AA%E4%BB%BF-MacOS-%E6%A1%8C%E9%9D%A2%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9A%E5%AE%9E%E7%8E%B0-Dock-%E5%8A%A8%E6%95%88/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E4%BB%BF-MacOS-%E6%A1%8C%E9%9D%A2%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95/"># 仿 MacOS 桌面项目记录</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2020/06/12/React-Hooks-TypeScript-%E5%81%9A%E4%B8%AA%E4%BB%BF-MacOS-%E6%A1%8C%E9%9D%A2%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9A%E7%82%B9%E5%87%BB%E6%95%88%E6%9E%9C%E4%B8%8E%E5%BC%B9%E7%AA%97/">React Hooks + TypeScript 做个仿 MacOS 桌面（三）：点击效果与弹窗</a>
+            
+            
+            <a class="next" rel="next" href="/2020/05/29/React-Hooks-TypeScript-%E5%81%9A%E4%B8%AA%E4%BB%BF-MacOS-%E6%A1%8C%E9%9D%A2%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E9%A1%B9%E7%9B%AE%E5%88%9D%E5%A7%8B%E5%8C%96/">React Hooks + TypeScript 做个仿 MacOS 桌面（一）：项目初始化</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Zhou Yuanda | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Zhou Yuanda">
+
+
+    <meta name="subtitle" content="试问谁可，洁白无比？">
+
+
+    <meta name="description" content="当然我也在扯淡。。">
+
+
+    <meta name="keywords" content="前端开发">
+
+
+<title>React Hooks + TypeScript 做个仿 MacOS 桌面（四）：Canvas 实现画图工具 | Ada 的个人博客主页</title>
+
+
+
+    <link rel="icon" href="/image/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/rss2.xml" title="Ada 的个人博客主页" type="application/rss+xml">
+</head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Ada&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Ada&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">React Hooks + TypeScript 做个仿 MacOS 桌面（四）：Canvas 实现画图工具</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Zhou Yuanda</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">June 18, 2020&nbsp;&nbsp;22:48:08</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <p>这是我的项目记录系列文章第四篇，<a href="https://zhuanlan.zhihu.com/p/147974188" target="_blank" rel="noopener">上一篇</a> 主要介绍了 Dock 弹框等的实现，同时提到了此次主角 drawing 画板。</p>
+<p>画板是目前实现的功能里较为典型的 Hooks 用例，本篇就来详细介绍下，画板最终的效果如图题所示，同时你可以在我的项目 <a href="https://github.com/Adashuai5/my-desktop">代码（欢迎 watch 和 star）</a>体验。</p>
+<h3 id="Canvas-实现画布（译文）"><a href="#Canvas-实现画布（译文）" class="headerlink" title="Canvas 实现画布（译文）"></a>Canvas 实现画布（译文）</h3><p>实现画布部分基本参考 <a href="https://dev.to/ankursheel/react-component-to-fraw-on-a-page-using-hooks-and-typescript-2ahp" target="_blank" rel="noopener">React Component to draw on a page using Hooks and Typescript</a> 该文提供完整代码及介绍，十分详细，如果你的英文不错，你可以直接看这篇文章跳过本节译文。</p>
+<h4 id="创建组件"><a href="#创建组件" class="headerlink" title="创建组件"></a>创建组件</h4><p>我们需要做的第一件事是创建一个 Canvas 组件。 画布需要占用一些空间，我们希望任何父组件都能够覆盖这些空间，所以我们将添加宽度和高度属性。</p>
+<p>同时我们将 window.innerWidth 和 window.innerHeight 分别设置为 Canvas 的宽度和高度 defaultProps。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">import React from &#39;react&#39;;</span><br><span class="line"></span><br><span class="line">interface CanvasProps &#123;</span><br><span class="line">    width: number;</span><br><span class="line">    height: number;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const Canvas &#x3D; (&#123; width, height &#125;: CanvasProps) &#x3D;&gt; &#123;</span><br><span class="line">     return &lt;canvas height&#x3D;&#123;height&#125; width&#x3D;&#123;width&#125; &#x2F;&gt;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">Canvas.defaultProps &#x3D; &#123;</span><br><span class="line">    width: window.innerWidth,</span><br><span class="line">    height: window.innerHeight,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">export default Canvas;</span><br></pre></td></tr></table></figure>
+
+<h4 id="让我们画画吧"><a href="#让我们画画吧" class="headerlink" title="让我们画画吧"></a>让我们画画吧</h4><p>因为我们需要修改 canvas 元素，所以我们需要为它添加一个 ref。 我们可以通过使用 useRef 钩子修改我们的 canvas 来实现这一点：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">const canvasRef &#x3D; useRef&lt;HTMLCanvasElement&gt;(null);</span><br><span class="line">return &lt;canvas ref&#x3D;&#123;canvasRef&#125; height&#x3D;&#123;height&#125; width&#x3D;&#123;width&#125; &#x2F;&gt;;</span><br></pre></td></tr></table></figure>
+
+<h4 id="设置状态"><a href="#设置状态" class="headerlink" title="设置状态"></a>设置状态</h4><p>我们需要跟踪一些变量:</p>
+<ul>
+<li>鼠标位置</li>
+<li>我们是否在画画</li>
+</ul>
+<p>我们可以通过添加 useState 钩子来做到这一点。Coordinate 是鼠标位置坐标的类型。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">type Coordinate &#x3D; &#123;</span><br><span class="line">    x: number;</span><br><span class="line">    y: number;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">const Canvas &#x3D; (&#123; width, height &#125;: CanvasProps) &#x3D;&gt; &#123;</span><br><span class="line">const [isPainting, setIsPainting] &#x3D; useState(false);</span><br><span class="line">const [mousePosition, setMousePosition] &#x3D; useState&lt;Coordinate | undefined&gt;(undefined);</span><br><span class="line">&#x2F;&#x2F; ... other stuff here</span><br></pre></td></tr></table></figure>
+
+<h4 id="当鼠标按下时开始绘图"><a href="#当鼠标按下时开始绘图" class="headerlink" title="当鼠标按下时开始绘图"></a>当鼠标按下时开始绘图</h4><p>我们将在 useEffect 钩子中添加事件侦听器。 如果我们有一个对画布的有效引用，那么我们将向 mouseDown 事件添加一个事件侦听器。 在 unmount 时，我们需要删除该事件侦听器。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">useEffect(() &#x3D;&gt; &#123;</span><br><span class="line">       if (!canvasRef.current) &#123;</span><br><span class="line">           return;</span><br><span class="line">       &#125;</span><br><span class="line">       const canvas: HTMLCanvasElement &#x3D; canvasRef.current;</span><br><span class="line">       canvas.addEventListener(&#39;mousedown&#39;, startPaint);</span><br><span class="line">       return () &#x3D;&gt; &#123;</span><br><span class="line">           canvas.removeEventListener(&#39;mousedown&#39;, startPaint);</span><br><span class="line">       &#125;;</span><br><span class="line">   &#125;, [startPaint]);</span><br></pre></td></tr></table></figure>
+
+<p>Startpaint 需要获取鼠标的当前坐标并将 isPainting 设置为 true。 我们还将把它包装在一个 useCallback 钩子中，这样我们就可以在 useCallback 钩子中使用它。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"> const startPaint &#x3D; useCallback((event: MouseEvent) &#x3D;&gt; &#123;</span><br><span class="line">        const coordinates &#x3D; getCoordinates(event);</span><br><span class="line">        if (coordinates) &#123;</span><br><span class="line">            setIsPainting(true);</span><br><span class="line">            setMousePosition(coordinates);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;, []);</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; ...other stuff here</span><br><span class="line"></span><br><span class="line">const getCoordinates &#x3D; (event: MouseEvent): Coordinate | undefined &#x3D;&gt; &#123;</span><br><span class="line">    if (!canvasRef.current) &#123;</span><br><span class="line">        return;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    const canvas: HTMLCanvasElement &#x3D; canvasRef.current;</span><br><span class="line">    return &#123;event.pageX - canvas.offsetLeft, event.pageY - canvas.offsetTop&#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h4 id="随鼠标移动画线"><a href="#随鼠标移动画线" class="headerlink" title="随鼠标移动画线"></a>随鼠标移动画线</h4><p>与 mouseDown 事件侦听器类似，我们将使用 useEffect hook 来添加 mousemove 事件。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">useEffect(() &#x3D;&gt; &#123;</span><br><span class="line">        if (!canvasRef.current) &#123;</span><br><span class="line">            return;</span><br><span class="line">        &#125;</span><br><span class="line">        const canvas: HTMLCanvasElement &#x3D; canvasRef.current;</span><br><span class="line">        canvas.addEventListener(&#39;mousemove&#39;, paint);</span><br><span class="line">        return () &#x3D;&gt; &#123;</span><br><span class="line">            canvas.removeEventListener(&#39;mousemove&#39;, paint);</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;, [paint]);</span><br></pre></td></tr></table></figure>
+
+<p>paint 需要：</p>
+<ul>
+<li>检查一下我们是否在 paint</li>
+<li>获取新鼠标坐标</li>
+<li>通过从画布获取呈现上下文，将新旧坐标连线</li>
+<li>更新旧坐标</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">const paint &#x3D; useCallback(</span><br><span class="line">        (event: MouseEvent) &#x3D;&gt; &#123;</span><br><span class="line">            if (isPainting) &#123;</span><br><span class="line">                const newMousePosition &#x3D; getCoordinates(event);</span><br><span class="line">                if (mousePosition &amp;&amp; newMousePosition) &#123;</span><br><span class="line">                    drawLine(mousePosition, newMousePosition);</span><br><span class="line">                    setMousePosition(newMousePosition);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        [isPainting, mousePosition]</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; ...other stuff here</span><br><span class="line"></span><br><span class="line">const drawLine &#x3D; (originalMousePosition: Coordinate, newMousePosition: Coordinate) &#x3D;&gt; &#123;</span><br><span class="line">        if (!canvasRef.current) &#123;</span><br><span class="line">            return;</span><br><span class="line">        &#125;</span><br><span class="line">        const canvas: HTMLCanvasElement &#x3D; canvasRef.current;</span><br><span class="line">        const context &#x3D; canvas.getContext(&#39;2d&#39;);</span><br><span class="line">        if (context) &#123;</span><br><span class="line">            context.strokeStyle &#x3D; &#39;red&#39;;</span><br><span class="line">            context.lineJoin &#x3D; &#39;round&#39;;</span><br><span class="line">            context.lineWidth &#x3D; 5;</span><br><span class="line"></span><br><span class="line">            context.beginPath();</span><br><span class="line">            context.moveTo(originalMousePosition.x, originalMousePosition.y);</span><br><span class="line">            context.lineTo(newMousePosition.x, newMousePosition.y);</span><br><span class="line">            context.closePath();</span><br><span class="line"></span><br><span class="line">            context.stroke();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br></pre></td></tr></table></figure>
+
+<h4 id="鼠标放开则停止绘制"><a href="#鼠标放开则停止绘制" class="headerlink" title="鼠标放开则停止绘制"></a>鼠标放开则停止绘制</h4><p>当用户释放鼠标或者将鼠标移出画布区域时，我们希望停止绘制：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">useEffect(() &#x3D;&gt; &#123;</span><br><span class="line">        if (!canvasRef.current) &#123;</span><br><span class="line">            return;</span><br><span class="line">        &#125;</span><br><span class="line">        const canvas: HTMLCanvasElement &#x3D; canvasRef.current;</span><br><span class="line">        canvas.addEventListener(&#39;mouseup&#39;, exitPaint);</span><br><span class="line">        canvas.addEventListener(&#39;mouseleave&#39;, exitPaint);</span><br><span class="line">        return () &#x3D;&gt; &#123;</span><br><span class="line">            canvas.removeEventListener(&#39;mouseup&#39;, exitPaint);</span><br><span class="line">            canvas.removeEventListener(&#39;mouseleave&#39;, exitPaint);</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;, [exitPaint]);</span><br></pre></td></tr></table></figure>
+
+<p>在 exitPaint 中，我们只是将 isPainting 设置为 false</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">const exitPaint &#x3D; useCallback(() &#x3D;&gt; &#123;</span><br><span class="line">        setIsPainting(false);</span><br><span class="line">    &#125;, []);</span><br></pre></td></tr></table></figure>
+
+<p>译文完</p>
+<h3 id="优化画板：添加功能"><a href="#优化画板：添加功能" class="headerlink" title="优化画板：添加功能"></a>优化画板：添加功能</h3><p>画板已经可以画画了，但是作为一个独立工具，只是能够画画是远远不够的，接下来我们为其添加功能面板：</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/7094266-1f27cc994e37b30b?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<h4 id="封装-Iconfont-组件"><a href="#封装-Iconfont-组件" class="headerlink" title="封装 Iconfont 组件"></a>封装 Iconfont 组件</h4><p>功能面板用到了很多图标，后续项目也会用到，因此我封装了一个 Iconfont 组件<br>，图标来源是 iconfont，每次我们修改或增加图标等，只需要修改 scriptElem.src 即可</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/7094266-f90cd3f40a5c4d26?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; src&#x2F;components&#x2F;iconfont&#x2F;index.tsx</span><br><span class="line">import React, &#123; CSSProperties, RefObject &#125; from &quot;react&quot;;</span><br><span class="line">import &quot;.&#x2F;index.scss&quot;;</span><br><span class="line"></span><br><span class="line">const scriptElem &#x3D; document.createElement(&quot;script&quot;);</span><br><span class="line">scriptElem.src &#x3D; &quot;&#x2F;&#x2F;at.alicdn.com&#x2F;t&#x2F;font_1848517_ds8sk573mfk.js&quot;;</span><br><span class="line">document.body.appendChild(scriptElem);</span><br><span class="line"></span><br><span class="line">interface PropsTypes &#123;</span><br><span class="line">  className?: string;</span><br><span class="line">  type: string;</span><br><span class="line">  style?: object;</span><br><span class="line">  svgRef?: RefObject&lt;SVGSVGElement&gt;;</span><br><span class="line">  clickEvent?: (T: any) &#x3D;&gt; void;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export const Iconfont &#x3D; (&#123;</span><br><span class="line">  className,</span><br><span class="line">  type,</span><br><span class="line">  style,</span><br><span class="line">  svgRef,</span><br><span class="line">  clickEvent,</span><br><span class="line">&#125;: PropsTypes) &#x3D;&gt; &#123;</span><br><span class="line">  return (</span><br><span class="line">    &lt;svg</span><br><span class="line">      ref&#x3D;&#123;svgRef&#125;</span><br><span class="line">      className&#x3D;&#123;className ? &quot;icon-font &quot; + className : &quot;icon-font&quot;&#125;</span><br><span class="line">      aria-hidden&#x3D;&quot;true&quot;</span><br><span class="line">      style&#x3D;&#123;style as CSSProperties&#125;</span><br><span class="line">      onClick&#x3D;&#123;clickEvent&#125;</span><br><span class="line">    &gt;</span><br><span class="line">      &lt;use xlinkHref&#x3D;&#123;&#96;#$&#123;type&#125;&#96;&#125; &#x2F;&gt;</span><br><span class="line">    &lt;&#x2F;svg&gt;</span><br><span class="line">  );</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; .&#x2F;index.scss</span><br><span class="line">.icon-font &#123;</span><br><span class="line">  width: 1em;</span><br><span class="line">  height: 1em;</span><br><span class="line">  vertical-align: -0.15em;</span><br><span class="line">  fill: currentColor;</span><br><span class="line">  overflow: hidden;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="功能面板结构"><a href="#功能面板结构" class="headerlink" title="功能面板结构"></a>功能面板结构</h4><p>功能面板结构如下，对应本节开头图片：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">import &#123; Iconfont &#125; from &quot;..&#x2F;iconfont&quot;;</span><br><span class="line">import &#123; CSSTransition &#125; from &quot;react-transition-group&quot;;</span><br><span class="line"></span><br><span class="line">return (</span><br><span class="line">    &lt;React.Fragment&gt;</span><br><span class="line">      &lt;canvas id&#x3D;&quot;canvas&quot; ref&#x3D;&#123;canvasRef&#125; height&#x3D;&#123;height&#125; width&#x3D;&#123;width&#125; &#x2F;&gt;</span><br><span class="line">      &lt;div</span><br><span class="line">        id&#x3D;&quot;toolbox-open&quot;</span><br><span class="line">        style&#x3D;&#123;</span><br><span class="line">          &#123;</span><br><span class="line">            borderRadius: isToolboxOpen ? null : 5,</span><br><span class="line">          &#125; as CSSProperties</span><br><span class="line">        &#125;</span><br><span class="line">      &gt;</span><br><span class="line">        &lt;Iconfont</span><br><span class="line">          type&#x3D;&#123;isToolboxOpen ? &quot;icon-upward_flat&quot; : &quot;icon-downward_flat&quot;&#125;</span><br><span class="line">          style&#x3D;&#123;&#123;</span><br><span class="line">            width: &quot;100%&quot;,</span><br><span class="line">            fontSize: 32,</span><br><span class="line">          &#125;&#125;</span><br><span class="line">          clickEvent&#x3D;&#123;toolboxOpenClick&#125;</span><br><span class="line">        &#x2F;&gt;</span><br><span class="line">      &lt;&#x2F;div&gt;</span><br><span class="line">      &lt;CSSTransition</span><br><span class="line">        in&#x3D;&#123;isToolboxOpen&#125; &#x2F;&#x2F;用于判断是否出现的状态</span><br><span class="line">        timeout&#x3D;&#123;300&#125; &#x2F;&#x2F;动画持续时间</span><br><span class="line">        classNames&#x3D;&quot;toolbox&quot; &#x2F;&#x2F;className值，防止重复</span><br><span class="line">        unmountOnExit</span><br><span class="line">      &gt;</span><br><span class="line">        &lt;div id&#x3D;&quot;toolbox&quot;&gt;</span><br><span class="line">              &lt;span&gt;Options&lt;&#x2F;span&gt;</span><br><span class="line">              &lt;div className&#x3D;&quot;options&quot;&gt;</span><br><span class="line">                ...</span><br><span class="line">              &lt;&#x2F;div&gt;</span><br><span class="line">              &lt;span&gt;Toolbox&lt;&#x2F;span&gt;</span><br><span class="line">              &lt;div className&#x3D;&quot;tools&quot;&gt;</span><br><span class="line">                ...</span><br><span class="line">          &lt;&#x2F;div&gt;</span><br><span class="line">          &lt;div className&#x3D;&quot;sizes&quot;&gt;</span><br><span class="line">            ...</span><br><span class="line">          &lt;&#x2F;div&gt;</span><br><span class="line">          &lt;ol className&#x3D;&quot;colors&quot;&gt;</span><br><span class="line">            ...</span><br><span class="line">          &lt;&#x2F;ol&gt;</span><br><span class="line">        &lt;&#x2F;div&gt;</span><br><span class="line">      &lt;&#x2F;CSSTransition&gt;</span><br><span class="line">    &lt;&#x2F;React.Fragment&gt;</span><br><span class="line">  )</span><br></pre></td></tr></table></figure>
+
+<p>通过 isToolboxOpen 设定功能面板是否收缩，引入 CSSTransition 添加展开收缩动画。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">const [isToolboxOpen, setToolboxOpen] &#x3D; useState(true);</span><br><span class="line">  const toolboxOpenClick &#x3D; useCallback(</span><br><span class="line">    (e) &#x3D;&gt; &#123;</span><br><span class="line">      setToolboxOpen(!isToolboxOpen);</span><br><span class="line">    &#125;,</span><br><span class="line">    [isToolboxOpen]</span><br><span class="line">  );</span><br></pre></td></tr></table></figure>
+
+<h4 id="下面我们依次介绍各个功能模块："><a href="#下面我们依次介绍各个功能模块：" class="headerlink" title="下面我们依次介绍各个功能模块："></a>下面我们依次介绍各个功能模块：</h4><h5 id="tools-面板："><a href="#tools-面板：" class="headerlink" title="tools 面板："></a>tools 面板：</h5><p><img src="https://upload-images.jianshu.io/upload_images/7094266-867a1490a29a8274?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<p>主要用来选择是画笔还是橡皮擦：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">const toolsMap &#x3D; [&quot;canvas_paint&quot;, &quot;canvas_eraser&quot;];</span><br><span class="line">const [eraserEnabled, setEraserEnabled] &#x3D; useState(false);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">&lt;div className&#x3D;&quot;tools&quot;&gt;</span><br><span class="line">  &#123;toolsMap.map((tool, index) &#x3D;&gt; &#123;</span><br><span class="line">    return (</span><br><span class="line">      &lt;Iconfont</span><br><span class="line">        key&#x3D;&#123;index + tool&#125;</span><br><span class="line">        className&#x3D;&#123;</span><br><span class="line">          tool &#x3D;&#x3D;&#x3D; &quot;canvas_eraser&quot;</span><br><span class="line">            ? eraserEnabled</span><br><span class="line">              ? &quot;active&quot;</span><br><span class="line">              : &quot;&quot;</span><br><span class="line">            : !eraserEnabled</span><br><span class="line">            ? &quot;active&quot;</span><br><span class="line">            : &quot;&quot;</span><br><span class="line">        &#125;</span><br><span class="line">        type&#x3D;&#123;&quot;icon-&quot; + tool&#125;</span><br><span class="line">        style&#x3D;&#123;&#123; fontSize: 50 &#125;&#125;</span><br><span class="line">        clickEvent&#x3D;&#123;(e) &#x3D;&gt; onToolsClick([e, tool])&#125;</span><br><span class="line">      &#x2F;&gt;</span><br><span class="line">    );</span><br><span class="line">  &#125;)&#125;</span><br><span class="line">&lt;&#x2F;div&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">const onToolsClick &#x3D; useCallback(([e, toolName]) &#x3D;&gt; &#123;</span><br><span class="line">  const el &#x3D; e.currentTarget;</span><br><span class="line">  if (el.classList[1]) return;</span><br><span class="line">  toolName &#x3D;&#x3D;&#x3D; &quot;canvas_eraser&quot;</span><br><span class="line">    ? setEraserEnabled(true)</span><br><span class="line">    : setEraserEnabled(false);</span><br><span class="line">  el.classList.add(&quot;active&quot;);</span><br><span class="line">  el.parentNode.childNodes.forEach((item: HTMLLIElement) &#x3D;&gt; &#123;</span><br><span class="line">    if (!item.matches(&quot;svg&quot;) || item &#x3D;&#x3D;&#x3D; el) return;</span><br><span class="line">    item.classList.remove(&quot;active&quot;);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;, []);</span><br></pre></td></tr></table></figure>
+
+<p>修改 paint 函数，通过 eraserEnabled 判断是 clearRect 还是 drawLine：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">if (mousePosition &amp;&amp; newMousePosition) &#123;</span><br><span class="line">  if (eraserEnabled) &#123;</span><br><span class="line">    clearRect(&#123;</span><br><span class="line">      x: newMousePosition.x - lineWidth &#x2F; 2,</span><br><span class="line">      y: newMousePosition.y - lineWidth &#x2F; 2,</span><br><span class="line">      width: lineWidth,</span><br><span class="line">      height: lineWidth,</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125; else &#123;</span><br><span class="line">    drawLine(mousePosition, newMousePosition);</span><br><span class="line">    setMousePosition(newMousePosition);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h5 id="sizes-colors-面板："><a href="#sizes-colors-面板：" class="headerlink" title="sizes/colors 面板："></a>sizes/colors 面板：</h5><p><img src="https://upload-images.jianshu.io/upload_images/7094266-4f803da20f795f2c?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<p>colors 面板列出了几种常用颜色，增加了原生颜色选择器，可改变画笔颜色：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&lt;ol className&#x3D;&quot;colors&quot;&gt;</span><br><span class="line">  &#123;colorMap.map((color, index) &#x3D;&gt; &#123;</span><br><span class="line">    return (</span><br><span class="line">      &lt;li</span><br><span class="line">        className&#x3D;&#123;color &#x3D;&#x3D;&#x3D; strokeStyle ? color + &quot; active&quot; : color&#125;</span><br><span class="line">        key&#x3D;&#123;index + color&#125;</span><br><span class="line">        onClick&#x3D;&#123;(e) &#x3D;&gt; onColorsClick([e, &quot;li&quot;, color])&#125;</span><br><span class="line">      &gt;&lt;&#x2F;li&gt;</span><br><span class="line">    );</span><br><span class="line">  &#125;)&#125;</span><br><span class="line">  &lt;input</span><br><span class="line">    type&#x3D;&quot;color&quot;</span><br><span class="line">    value&#x3D;&#123;strokeStyle&#125;</span><br><span class="line">    onChange&#x3D;&#123;onColorsChange&#125;</span><br><span class="line">    id&#x3D;&quot;currentColor&quot;</span><br><span class="line">  &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;ol&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">const [strokeStyle, setStrokeStyle] &#x3D; useState(&quot;black&quot;);</span><br><span class="line"></span><br><span class="line">const onColorsClick &#x3D; useCallback(([e, selector, color]) &#x3D;&gt; &#123;</span><br><span class="line">  const el &#x3D; e.target;</span><br><span class="line">  if (el.className.includes(&quot;active&quot;)) return;</span><br><span class="line">  setStrokeStyle(color);</span><br><span class="line">  el.classList.add(&quot;active&quot;);</span><br><span class="line">  el.parentNode.childNodes.forEach((item: HTMLLIElement) &#x3D;&gt; &#123;</span><br><span class="line">    if (!item.matches(selector) || item &#x3D;&#x3D;&#x3D; el) return;</span><br><span class="line">    item.classList.remove(&quot;active&quot;);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;, []);</span><br></pre></td></tr></table></figure>
+
+<p>sizes 主要用来修改画笔或橡皮檫粗细：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&lt;div className&#x3D;&quot;sizes&quot;&gt;</span><br><span class="line">  &lt;input</span><br><span class="line">    style&#x3D;&#123;</span><br><span class="line">      &#123;</span><br><span class="line">        backgroundColor: eraserEnabled ? &quot;#ebeff4&quot; : strokeStyle,</span><br><span class="line">      &#125; as CSSProperties</span><br><span class="line">    &#125;</span><br><span class="line">    type&#x3D;&quot;range&quot;</span><br><span class="line">    id&#x3D;&quot;range&quot;</span><br><span class="line">    name&#x3D;&quot;range&quot;</span><br><span class="line">    min&#x3D;&quot;1&quot;</span><br><span class="line">    max&#x3D;&quot;20&quot;</span><br><span class="line">    value&#x3D;&#123;lineWidth&#125;</span><br><span class="line">    onChange&#x3D;&#123;onSizesChange&#125;</span><br><span class="line">  &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;div&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">const [lineWidth, setLineWidth] &#x3D; useState(5);</span><br><span class="line"></span><br><span class="line">const onSizesChange &#x3D; useCallback((e) &#x3D;&gt; &#123;</span><br><span class="line">  setLineWidth(e.target.value);</span><br><span class="line">&#125;, []);</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h5 id="options-面板："><a href="#options-面板：" class="headerlink" title="options 面板："></a>options 面板：</h5><p><img src="https://upload-images.jianshu.io/upload_images/7094266-856b72c57f443e8f?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<p>主要有保存、清空、回退及前进功能：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">const optionsMap &#x3D; [</span><br><span class="line">  &quot;canvas_save&quot;,</span><br><span class="line">  &quot;canvas_clear&quot;,</span><br><span class="line">  &quot;turn_left_flat&quot;,</span><br><span class="line">  &quot;turn_right_flat&quot;,</span><br><span class="line">];</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&lt;div className&#x3D;&quot;options&quot;&gt;</span><br><span class="line">  &#123;optionsMap.map((option, index) &#x3D;&gt; &#123;</span><br><span class="line">    return (</span><br><span class="line">      &lt;Iconfont</span><br><span class="line">        svgRef&#x3D;&#123;</span><br><span class="line">          option &#x3D;&#x3D;&#x3D; &quot;turn_right_flat&quot;</span><br><span class="line">            ? goRef</span><br><span class="line">            : option &#x3D;&#x3D;&#x3D; &quot;turn_left_flat&quot;</span><br><span class="line">            ? backRef</span><br><span class="line">            : undefined</span><br><span class="line">        &#125;</span><br><span class="line">        key&#x3D;&#123;index + option&#125;</span><br><span class="line">        className&#x3D;&#123;option&#125;</span><br><span class="line">        type&#x3D;&#123;&quot;icon-&quot; + option&#125;</span><br><span class="line">        style&#x3D;&#123;&#123; fontSize: 50 &#125;&#125;</span><br><span class="line">        clickEvent&#x3D;&#123;(e) &#x3D;&gt; onOptionsClick([e, option])&#125;</span><br><span class="line">      &#x2F;&gt;</span><br><span class="line">    );</span><br><span class="line">  &#125;)&#125;</span><br><span class="line">&lt;&#x2F;div&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">const onOptionsClick &#x3D; useCallback(</span><br><span class="line">  ([e, toolName]) &#x3D;&gt; &#123;</span><br><span class="line">    switch (toolName) &#123;</span><br><span class="line">      case &quot;canvas_clear&quot;:</span><br><span class="line">        setClearDialogOpen(true);</span><br><span class="line">        break;</span><br><span class="line">      case &quot;canvas_save&quot;:</span><br><span class="line">        saveCanvas();</span><br><span class="line">        break;</span><br><span class="line">      case &quot;turn_left_flat&quot;:</span><br><span class="line">        changeCanvas(&quot;back&quot;);</span><br><span class="line">        break;</span><br><span class="line">      case &quot;turn_right_flat&quot;:</span><br><span class="line">        changeCanvas(&quot;go&quot;);</span><br><span class="line">        break;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  [saveCanvas, changeCanvas]</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>首先我们介绍 回退及前进：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">const backRef &#x3D; useRef&lt;SVGSVGElement&gt;(null);</span><br><span class="line">const goRef &#x3D; useRef&lt;SVGSVGElement&gt;(null);</span><br><span class="line">const [step, setStep] &#x3D; useState(-1);</span><br><span class="line">const [canvasHistory, setCanvasHistory] &#x3D; useState&lt;string[]&gt;([]);</span><br></pre></td></tr></table></figure>
+
+<p>我们在每次画笔或橡皮 mouseup 时，记录下 canvas 片段（saveFragment），值得注意的是，这里我们的 mouseleave 还应该是上文原来的 exitPaint（无 saveFragment）：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">const exitPaint &#x3D; useCallback(() &#x3D;&gt; &#123;</span><br><span class="line">  setIsPainting(false);</span><br><span class="line">  setMousePosition(undefined);</span><br><span class="line">  saveFragment();</span><br><span class="line">&#125;, [saveFragment]);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">const saveFragment &#x3D; useCallback(() &#x3D;&gt; &#123;</span><br><span class="line">  setStep(step + 1);</span><br><span class="line">  if (!canvasRef.current) &#123;</span><br><span class="line">    return;</span><br><span class="line">  &#125;</span><br><span class="line">  const canvas: HTMLCanvasElement &#x3D; canvasRef.current;</span><br><span class="line">  canvasHistory.push(canvas.toDataURL());</span><br><span class="line">  setCanvasHistory(canvasHistory);</span><br><span class="line"></span><br><span class="line">  if (!backRef.current || !goRef.current) &#123;</span><br><span class="line">    return;</span><br><span class="line">  &#125;</span><br><span class="line">  const back: SVGSVGElement &#x3D; backRef.current;</span><br><span class="line">  const go: SVGSVGElement &#x3D; goRef.current;</span><br><span class="line">  back.classList.add(&quot;active&quot;);</span><br><span class="line">  go.classList.remove(&quot;active&quot;);</span><br><span class="line">&#125;, [step, canvasHistory]);</span><br></pre></td></tr></table></figure>
+
+<p>当我们点击这两个按钮就会触发 changeCanvas，获取 step 从而得到对应 canvasHistory 内 url，根据它我们能生成一个片段图片画到画布上下文内。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">const changeCanvas &#x3D; useCallback(</span><br><span class="line">  (type) &#x3D;&gt; &#123;</span><br><span class="line">    if (!canvasRef.current || !backRef.current || !goRef.current) &#123;</span><br><span class="line">      return;</span><br><span class="line">    &#125;</span><br><span class="line">    const canvas: HTMLCanvasElement &#x3D; canvasRef.current;</span><br><span class="line">    const context &#x3D; canvas.getContext(&quot;2d&quot;);</span><br><span class="line">    const back: SVGSVGElement &#x3D; backRef.current;</span><br><span class="line">    const go: SVGSVGElement &#x3D; goRef.current;</span><br><span class="line">    if (context) &#123;</span><br><span class="line">      let currentStep &#x3D; -1;</span><br><span class="line">      if (type &#x3D;&#x3D;&#x3D; &quot;back&quot; &amp;&amp; step &gt;&#x3D; 0) &#123;</span><br><span class="line">        currentStep &#x3D; step - 1;</span><br><span class="line">        go.classList.add(&quot;active&quot;);</span><br><span class="line">        if (currentStep &lt; 0) &#123;</span><br><span class="line">          back.classList.remove(&quot;active&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125; else if (type &#x3D;&#x3D;&#x3D; &quot;go&quot; &amp;&amp; step &lt; canvasHistory.length - 1) &#123;</span><br><span class="line">        currentStep &#x3D; step + 1;</span><br><span class="line">        back.classList.add(&quot;active&quot;);</span><br><span class="line">        if (currentStep &#x3D;&#x3D;&#x3D; canvasHistory.length - 1) &#123;</span><br><span class="line">          go.classList.remove(&quot;active&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125; else &#123;</span><br><span class="line">        return;</span><br><span class="line">      &#125;</span><br><span class="line">      context.clearRect(0, 0, width, height);</span><br><span class="line">      const canvasPic &#x3D; new Image();</span><br><span class="line">      canvasPic.src &#x3D; canvasHistory[currentStep];</span><br><span class="line">      canvasPic.addEventListener(&quot;load&quot;, () &#x3D;&gt; &#123;</span><br><span class="line">        context.drawImage(canvasPic, 0, 0);</span><br><span class="line">      &#125;);</span><br><span class="line">      setStep(currentStep);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  [canvasHistory, step, width, height]</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>接着我们来看下 保存按钮的实现：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">const saveCanvas &#x3D; useCallback(() &#x3D;&gt; &#123;</span><br><span class="line">  if (!canvasRef.current) &#123;</span><br><span class="line">    return;</span><br><span class="line">  &#125;</span><br><span class="line">  const canvas: HTMLCanvasElement &#x3D; canvasRef.current;</span><br><span class="line">  const context &#x3D; canvas.getContext(&quot;2d&quot;);</span><br><span class="line">  if (context) &#123;</span><br><span class="line">    &#x2F;&#x2F; 用于记录当前 context.globalCompositeOperation ——（合成或混合模式）</span><br><span class="line">    const compositeOperation &#x3D; context.globalCompositeOperation;、</span><br><span class="line">    &#x2F;&#x2F; 设置为 “在现有的画布内容后面绘制新的图形”</span><br><span class="line">    context.globalCompositeOperation &#x3D; &quot;destination-over&quot;;</span><br><span class="line">    context.fillStyle &#x3D; &quot;#fff&quot;;</span><br><span class="line">    context.fillRect(0, 0, width, height);</span><br><span class="line">    const imageData &#x3D; canvas.toDataURL(&quot;image&#x2F;png&quot;);</span><br><span class="line">    &#x2F;&#x2F; 将数据从已有的 ImageData 对象绘制到位图</span><br><span class="line">    context.putImageData(context.getImageData(0, 0, width, height), 0, 0);</span><br><span class="line">    &#x2F;&#x2F; 复原 context.globalCompositeOperation</span><br><span class="line">    context.globalCompositeOperation &#x3D; compositeOperation;</span><br><span class="line">    &#x2F;&#x2F; 下载操作</span><br><span class="line">    const a &#x3D; document.createElement(&quot;a&quot;);</span><br><span class="line">    document.body.appendChild(a);</span><br><span class="line">    a.href &#x3D; imageData;</span><br><span class="line">    a.download &#x3D; &quot;myPaint&quot;;</span><br><span class="line">    a.target &#x3D; &quot;_blank&quot;;</span><br><span class="line">    a.click();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;, [width, height]);</span><br></pre></td></tr></table></figure>
+
+<p>最后我们来讲讲清空按钮：</p>
+<p>清空按钮的实现其实十分简单，但是点击直接删除的话交互太不友好，我们需要给他来个确认弹框，</p>
+<p>根据第三篇讲到的 UseModel 组件我们可以快速写出一个弹框：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><span class="line">import React, &#123; useMemo, useState, CSSProperties &#125; from &quot;react&quot;;</span><br><span class="line">import &#123; Dialog, Button &#125; from &quot;react-desktop&#x2F;macOs&quot;;</span><br><span class="line">&#x2F;&#x2F;&#x2F; &lt;reference path&#x3D;&quot;react-desktop.d.ts&quot; &#x2F;&gt;</span><br><span class="line"></span><br><span class="line">interface DialogProps &#123;</span><br><span class="line">  width: number;</span><br><span class="line">  height: number;</span><br><span class="line">  id: string;</span><br><span class="line">  title?: string;</span><br><span class="line">  message?: string;</span><br><span class="line">  imgSrc?: string;</span><br><span class="line">  onCheck: (T: any) &#x3D;&gt; void;</span><br><span class="line">  onClose: (T: any) &#x3D;&gt; void;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export const useDialog &#x3D; () &#x3D;&gt; &#123;</span><br><span class="line">  const [isVisible, setIsVisible] &#x3D; useState(false);</span><br><span class="line">  const openDialog &#x3D; () &#x3D;&gt; setIsVisible(true);</span><br><span class="line">  const closeDialog &#x3D; () &#x3D;&gt; setIsVisible(false);</span><br><span class="line">  const RenderDialog &#x3D; (&#123;</span><br><span class="line">    width,</span><br><span class="line">    height,</span><br><span class="line">    id,</span><br><span class="line">    title,</span><br><span class="line">    message,</span><br><span class="line">    imgSrc,</span><br><span class="line">    onCheck,</span><br><span class="line">    onClose,</span><br><span class="line">  &#125;: DialogProps) &#x3D;&gt; &#123;</span><br><span class="line">    const styles &#x3D; useMemo(</span><br><span class="line">      () &#x3D;&gt; (&#123;</span><br><span class="line">        width: width,</span><br><span class="line">        height: height,</span><br><span class="line">        left: &#96;calc(50vw - $&#123;width &#x2F; 2&#125;px)&#96;,</span><br><span class="line">        top: &#96;calc(50vh - $&#123;height&#125;px)&#96;,</span><br><span class="line">        borderRadius: 4,</span><br><span class="line">      &#125;),</span><br><span class="line">      [width, height]</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    const renderIcon &#x3D; () &#x3D;&gt; &#123;</span><br><span class="line">      if (!imgSrc) return;</span><br><span class="line">      return (</span><br><span class="line">        &lt;img</span><br><span class="line">          src&#x3D;&#123;require(&quot;..&#x2F;footer&#x2F;image&#x2F;&quot; + imgSrc)&#125;</span><br><span class="line">          width&#x3D;&quot;52&quot;</span><br><span class="line">          height&#x3D;&quot;52&quot;</span><br><span class="line">          alt&#x3D;&quot;tip&quot;</span><br><span class="line">        &#x2F;&gt;</span><br><span class="line">      );</span><br><span class="line">    &#125;;</span><br><span class="line">    return (</span><br><span class="line">      &lt;React.Fragment&gt;</span><br><span class="line">        &#123;isVisible &amp;&amp; (</span><br><span class="line">          &lt;div id&#x3D;&#123;id&#125; style&#x3D;&#123;styles as CSSProperties&#125;&gt;</span><br><span class="line">            &lt;Dialog</span><br><span class="line">              title&#x3D;&#123;title&#125;</span><br><span class="line">              message&#x3D;&#123;message&#125;</span><br><span class="line">              icon&#x3D;&#123;renderIcon()&#125;</span><br><span class="line">              buttons&#x3D;&#123;[</span><br><span class="line">                &lt;Button onClick&#x3D;&#123;onClose&#125;&gt;取消&lt;&#x2F;Button&gt;,</span><br><span class="line">                &lt;Button color&#x3D;&quot;blue&quot; onClick&#x3D;&#123;onCheck&#125;&gt;</span><br><span class="line">                  确认</span><br><span class="line">                &lt;&#x2F;Button&gt;,</span><br><span class="line">              ]&#125;</span><br><span class="line">            &#x2F;&gt;</span><br><span class="line">          &lt;&#x2F;div&gt;</span><br><span class="line">        )&#125;</span><br><span class="line">      &lt;&#x2F;React.Fragment&gt;</span><br><span class="line">    );</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  return &#123;</span><br><span class="line">    openDialog,</span><br><span class="line">    closeDialog,</span><br><span class="line">    RenderDialog,</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>使用也是一样的十分简单：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">import &#123; useDialog &#125; from &quot;..&#x2F;dialog&#x2F;index&quot;;</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">const &#123; openDialog, closeDialog, RenderDialog &#125; &#x3D; useDialog();</span><br><span class="line">const [isClearDialogOpen, setClearDialogOpen] &#x3D; useState(false);</span><br><span class="line">useEffect(isClearDialogOpen ? openDialog : closeDialog, [isClearDialogOpen]);</span><br><span class="line"></span><br><span class="line">return (</span><br><span class="line">  &lt;React.Fragment&gt;</span><br><span class="line">    ...</span><br><span class="line">    &lt;RenderDialog</span><br><span class="line">      width&#x3D;&#123;300&#125;</span><br><span class="line">      height&#x3D;&#123;120&#125;</span><br><span class="line">      id&#x3D;&quot;clear-dialog&quot;</span><br><span class="line">      title&#x3D;&quot;您确定要清空该画布吗？&quot;</span><br><span class="line">      message&#x3D;&quot;一旦清空将无法撤回。&quot;</span><br><span class="line">      imgSrc&#x3D;&#123;&quot;Drawing.png&quot;&#125;</span><br><span class="line">      onCheck&#x3D;&#123;checkClearDialog&#125;</span><br><span class="line">      onClose&#x3D;&#123;closeClearDialog&#125;</span><br><span class="line">    &gt;&lt;&#x2F;RenderDialog&gt;</span><br><span class="line">  &lt;&#x2F;React.Fragment&gt;</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>效果如下图：</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/7094266-131d24964ff76e17?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 确认清空</span><br><span class="line">const checkClearDialog &#x3D; useCallback(</span><br><span class="line">  (e) &#x3D;&gt; &#123;</span><br><span class="line">    clearRect(&#123;</span><br><span class="line">      x: 0,</span><br><span class="line">      y: 0,</span><br><span class="line">      width,</span><br><span class="line">      height,</span><br><span class="line">    &#125;);</span><br><span class="line">    setCanvasHistory([]);</span><br><span class="line">    setStep(-1);</span><br><span class="line">    closeClearDialog(e);</span><br><span class="line">    if (!backRef.current || !goRef.current) &#123;</span><br><span class="line">      return;</span><br><span class="line">    &#125;</span><br><span class="line">    const back: SVGSVGElement &#x3D; backRef.current;</span><br><span class="line">    const go: SVGSVGElement &#x3D; goRef.current;</span><br><span class="line">    back.classList.remove(&quot;active&quot;);</span><br><span class="line">    go.classList.remove(&quot;active&quot;);</span><br><span class="line">  &#125;,</span><br><span class="line">  [closeClearDialog, clearRect, width, height]</span><br><span class="line">);</span><br><span class="line">&#x2F;&#x2F; 取消</span><br><span class="line">const closeClearDialog &#x3D; useCallback(</span><br><span class="line">  (e) &#x3D;&gt; &#123;</span><br><span class="line">    setClearDialogOpen(false);</span><br><span class="line">  &#125;,</span><br><span class="line">  [setClearDialogOpen]</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>功能面板完。</p>
+<p>至此，一个简约而不简单的画板就完成了。</p>
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>本篇文章梳理了仿 MacOS 桌面中画图工具的实现过程，代码及功能并不复杂但有很多值得注意的细节，希望通过该文章你能够掌握 React Hooks 基本用法及对 Canvas 有一定了解。</p>
+<p>如果你喜欢这篇文章，不要忘了给我点赞（收藏永远比点赞多，可以像 B 站一样三连啊哈哈）。🍮</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Zhou Yuanda</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://github.com/Adashuai5/Adashuai5.github.io/2020/06/18/React-Hooks-TypeScript-%E5%81%9A%E4%B8%AA%E4%BB%BF-MacOS-%E6%A1%8C%E9%9D%A2%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9ACanvas-%E5%AE%9E%E7%8E%B0%E7%94%BB%E5%9B%BE%E5%B7%A5%E5%85%B7/">https://github.com/Adashuai5/Adashuai5.github.io/2020/06/18/React-Hooks-TypeScript-%E5%81%9A%E4%B8%AA%E4%BB%BF-MacOS-%E6%A1%8C%E9%9D%A2%EF%BC%88%E5%9B%9B%EF%BC%89%EF%BC%9ACanvas-%E5%AE%9E%E7%8E%B0%E7%94%BB%E5%9B%BE%E5%B7%A5%E5%85%B7/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E4%BB%BF-MacOS-%E6%A1%8C%E9%9D%A2%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95/"># 仿 MacOS 桌面项目记录</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2020/06/12/React-Hooks-TypeScript-%E5%81%9A%E4%B8%AA%E4%BB%BF-MacOS-%E6%A1%8C%E9%9D%A2%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9A%E7%82%B9%E5%87%BB%E6%95%88%E6%9E%9C%E4%B8%8E%E5%BC%B9%E7%AA%97/">React Hooks + TypeScript 做个仿 MacOS 桌面（三）：点击效果与弹窗</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Zhou Yuanda | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

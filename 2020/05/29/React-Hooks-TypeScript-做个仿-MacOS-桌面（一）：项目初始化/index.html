@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Zhou Yuanda">
+
+
+    <meta name="subtitle" content="试问谁可，洁白无比？">
+
+
+    <meta name="description" content="当然我也在扯淡。。">
+
+
+    <meta name="keywords" content="前端开发">
+
+
+<title>React Hooks + TypeScript 做个仿 MacOS 桌面（一）：项目初始化 | Ada 的个人博客主页</title>
+
+
+
+    <link rel="icon" href="/image/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/rss2.xml" title="Ada 的个人博客主页" type="application/rss+xml">
+</head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Ada&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Ada&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">React Hooks + TypeScript 做个仿 MacOS 桌面（一）：项目初始化</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Zhou Yuanda</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">May 29, 2020&nbsp;&nbsp;22:39:41</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h3 id="项目初衷"><a href="#项目初衷" class="headerlink" title="项目初衷"></a>项目初衷</h3><p>0 做个有特点的前端项目，而 MacOS 系统桌面可以实现的东西太多了</p>
+<p>1 工作中主要技术栈为 vue2.x，想通过项目实践 react 的学习（hooks 熟练了，react 和 vue3.0 都间接拿下了）</p>
+<p>2 熟悉并实践 TypeScript</p>
+<h3 id="附属"><a href="#附属" class="headerlink" title="附属"></a>附属</h3><p>我的电脑其实不是 macOS 系统，所以注定只能低仿。但这不影响我学习 macOS 如 dock 的炫酷效果的实现及达到上述初衷的目的。</p>
+<p>通过该 <a href="https://www.bilibili.com/video/BV12t411g7Zv/" target="_blank" rel="noopener">教程</a> 修改了我的桌面，作为参考</p>
+<p><a href="https://www.mydockfinder.com/index.html#time=9&NewVariable1=1&CSUM=1" target="_blank" rel="noopener">主要软件 mydockfinder</a></p>
+<h3 id="开发环境搭建"><a href="#开发环境搭建" class="headerlink" title="开发环境搭建"></a>开发环境搭建</h3><p>直接使用 create-react-app with typescript 来快速搭建</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yarn create-react-app my-app --typescript</span><br></pre></td></tr></table></figure>
+
+<p>引入 sass 为 css 预处理</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yarn add node-sass</span><br></pre></td></tr></table></figure>
+
+<h3 id="设置背景图片"><a href="#设置背景图片" class="headerlink" title="设置背景图片"></a>设置背景图片</h3><p>删除所有不必要的文件及代码后, 我使用上面教程中获取的文件中的 sierra-4K.jpg 作为 App 界面背景</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; App.scss</span><br><span class="line">.App &#123;</span><br><span class="line">  min-width: 1500px;</span><br><span class="line">  background: url(..&#x2F;assets&#x2F;image&#x2F;sierra-4K.jpg) center&#x2F;100% no-repeat;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>效果如下</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/7094266-9b33e3cc2cd4e3d3?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<h3 id="使用-Github-自动化部署"><a href="#使用-Github-自动化部署" class="headerlink" title="使用 Github 自动化部署"></a>使用 Github 自动化部署</h3><p><a href="https://create-react-app.dev/docs/deployment/#github-pages" target="_blank" rel="noopener">Create React App 官方文档提供的部署到 github</a> 的方法有问题</p>
+<p>我使用了 GitHub Actions 代替 <a href="https://frankwang1991.github.io/2019/11/21/use-github-actions-publish-reactapp/" target="_blank" rel="noopener">参考</a></p>
+<p>在 package.json 内添加 homepage</p>
+<p>格式：https://{yourGithubName}.github.io/{yourRepositoryName}</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; package.json</span><br><span class="line">&#x2F;&#x2F; ...</span><br><span class="line">  ,</span><br><span class="line">  &quot;homepage&quot;: &quot;https:&#x2F;&#x2F;adashuai5.github.io&#x2F;my-desktop&quot;</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F; ...</span><br></pre></td></tr></table></figure>
+
+<p>新建项目文件 .github/workflows/ci.yml</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">name: my-desktop</span><br><span class="line">on:</span><br><span class="line">  push:</span><br><span class="line">    branches:</span><br><span class="line">      - master</span><br><span class="line">jobs:</span><br><span class="line">  build-and-deploy:</span><br><span class="line">    runs-on: ubuntu-latest</span><br><span class="line">    steps:</span><br><span class="line">      - name: Checkout</span><br><span class="line">        uses: actions&#x2F;checkout@master</span><br><span class="line"></span><br><span class="line">      - name: Build and Deploy</span><br><span class="line">        uses: JamesIves&#x2F;github-pages-deploy-action@master</span><br><span class="line">        env:</span><br><span class="line">          ACCESS_TOKEN: $&#123;&#123; secrets.MY_WINDOW &#125;&#125;</span><br><span class="line">          BRANCH: gh-pages</span><br><span class="line">          FOLDER: build</span><br><span class="line">          BUILD_SCRIPT: npm install &amp;&amp; npm run build</span><br></pre></td></tr></table></figure>
+
+<p>这里的 ACCESS_TOKEN 是在 Github repo 中 Settings 栏下设置的 Secrets</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/7094266-f72d9e80d88d5353?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>做好这些，在你每次 push 后 Github 就会自动运行 Actions 形成工作流了</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/7094266-434d2834287ed33f?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>等你的 push 成功，即可打开 Settings，找到 Github Pages</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/7094266-d2d3766e96f83718?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>选择 gh-pages branch 此时会出现如上图所示项目浏览链接，如我这个项目 <a href="https://adashuai5.github.io/my-desktop/" target="_blank" rel="noopener">my-desktop</a></p>
+<p>另外，该项目 <a href="https://github.com/Adashuai5/my-desktop">代码</a>，欢迎 watch 和 star。</p>
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>至此，项目流程算是走了一遍。</p>
+<p>目前该项目已完成 dock，简单设置，基础计算器，基础画板等功能，即使是这些已有功能也有很多需要完善的地方。</p>
+<p>后续我会慢慢优化，并在相应模块代码优化到一定程度时不定时更新系列文章。🍮</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Zhou Yuanda</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://github.com/Adashuai5/Adashuai5.github.io/2020/05/29/React-Hooks-TypeScript-%E5%81%9A%E4%B8%AA%E4%BB%BF-MacOS-%E6%A1%8C%E9%9D%A2%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E9%A1%B9%E7%9B%AE%E5%88%9D%E5%A7%8B%E5%8C%96/">https://github.com/Adashuai5/Adashuai5.github.io/2020/05/29/React-Hooks-TypeScript-%E5%81%9A%E4%B8%AA%E4%BB%BF-MacOS-%E6%A1%8C%E9%9D%A2%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E9%A1%B9%E7%9B%AE%E5%88%9D%E5%A7%8B%E5%8C%96/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E4%BB%BF-MacOS-%E6%A1%8C%E9%9D%A2%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95/"># 仿 MacOS 桌面项目记录</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2020/06/05/React-Hooks-TypeScript-%E5%81%9A%E4%B8%AA%E4%BB%BF-MacOS-%E6%A1%8C%E9%9D%A2%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9A%E5%AE%9E%E7%8E%B0-Dock-%E5%8A%A8%E6%95%88/">React Hooks + TypeScript 做个仿 MacOS 桌面（二）：实现 Dock 动效</a>
+            
+            
+            <a class="next" rel="next" href="/2020/05/01/%E3%80%90%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%E3%80%91vue-element-ui-%E8%B8%A9%E5%9D%91%E2%80%94%E2%80%94-table-%E7%AF%87/">【经验总结】vue + element-ui 踩坑—— table 篇</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Zhou Yuanda | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

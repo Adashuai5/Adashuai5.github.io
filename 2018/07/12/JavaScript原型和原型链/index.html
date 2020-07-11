@@ -137,13 +137,13 @@
 <blockquote>
 <p>每个实例对象（ object ）都有一个私有属性（称之为 <strong>proto</strong> ）指向它的构造函数的原型对象（prototype ）。该原型对象也有一个自己的原型对象( <strong>proto</strong> ) ，层层向上直到一个对象的原型对象为 null。根据定义，null 没有原型，并作为这个原型链中的最后一个环节。</p>
 </blockquote>
-<p><img src="https://upload-images.jianshu.io/upload_images/7094266-2e79d6fbb9c205e1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/7094266-c9e28000b43ca445.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
 <p>上面是 <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Inheritance_and_the_prototype_chain" target="_blank" rel="noopener">MDN 里有关原型链知识</a> 的摘录，什么意思？让我们来解释一下</p>
 <p>事实上 JavaScript 所有数据都可以以对象的形式表现：由于函数是对象，我们可以用构造函数的方法使得 Number、Boolean、String 变成对象。</p>
 <p>下面以 Number 为例 （其他类型也一样）</p>
 <p>可以用 var 基本类型 = new 对应基本类型的函数() 的方法创建一个新函数</p>
 <p>var n = new Number() 创建一个 Number 函数，其是一个对象</p>
-<p><img src="https://upload-images.jianshu.io/upload_images/7094266-62536de6cd21ab12.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/7094266-62536de6cd21ab12.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
 <p>这里的 n 就是 Number 的实例对象，可以看到 n 里面有一个 <strong>proto</strong> 指向 Number 所指向的原型对象（也是 n 自己本身的原型对象），Number 为 n 的构造函数，它通过 prototype 指向自己的原型对象，而后又可以通过 constructor 指向回 Number 本身；</p>
 <p>而 Number 函数也有一个 <strong>proto</strong> 指向 Object 这个构造函数的原型对象，Object 通过 prototype 指向自己原型对象 ；</p>
 <p>Object 函数没有 <strong>proto</strong>，证明其已经到达最后的属性层，他的 <strong>proto</strong> 指向为 null。</p>
@@ -172,7 +172,7 @@
 <p><strong>var function = new Function()</strong></p>
 <p><strong>function.</strong>proto** === Function.prototype**</p>
 <p><strong>Function.</strong>proto** === Function.prototype**</p>
-<p><img src="https://upload-images.jianshu.io/upload_images/7094266-b6a6447f260e8db4.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/7094266-b6a6447f260e8db4.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
 <hr>
 <p>本文主要用于个人学习使用，如有侵权请联系我删除。</p>
 <p>参考及推荐：</p>
